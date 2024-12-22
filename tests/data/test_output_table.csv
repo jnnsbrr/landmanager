@@ -1,0 +1,211 @@
+year,cell,lon,lat,country,area [km2],entity,variable,value,unit
+2023,9,5.25,53.25,NLD,346.3626,Farmer,AFT ID,1.0,
+2023,9,5.25,53.25,NLD,346.3626,Farmer,soil organic carbon,3152.681640625,gC/m²
+2023,9,5.25,53.25,NLD,346.3626,Farmer,average crop yield,111.02227783203125,gC/m²
+2023,9,5.25,53.25,NLD,346.3626,Farmer,agent tillage behaviour,1.0,
+2023,9,5.25,53.25,NLD,346.3626,Farmer,perceived behavioural control,0.95,
+2023,9,5.25,53.25,NLD,346.3626,Farmer,theory of planned behaviour,0.0,
+2023,9,5.25,53.25,NLD,346.3626,Farmer,social norm,0.2689414213699951,
+2023,9,5.25,53.25,NLD,346.3626,Farmer,attitude,0.5,
+2023,9,5.25,53.25,NLD,346.3626,Farmer,attitude towards own land,0.5,
+2023,9,5.25,53.25,NLD,346.3626,Farmer,attitude based on social learning,0.5,
+2023,0,3.75,51.75,NLD,796.7034,Farmer,AFT ID,0.0,
+2023,0,3.75,51.75,NLD,796.7034,Farmer,soil organic carbon,2897.47265625,gC/m²
+2023,0,3.75,51.75,NLD,796.7034,Farmer,average crop yield,66.32331085205078,gC/m²
+2023,0,3.75,51.75,NLD,796.7034,Farmer,agent tillage behaviour,1.0,
+2023,0,3.75,51.75,NLD,796.7034,Farmer,perceived behavioural control,0.75,
+2023,0,3.75,51.75,NLD,796.7034,Farmer,theory of planned behaviour,0.0,
+2023,0,3.75,51.75,NLD,796.7034,Farmer,social norm,0.2689414213699951,
+2023,0,3.75,51.75,NLD,796.7034,Farmer,attitude,0.5,
+2023,0,3.75,51.75,NLD,796.7034,Farmer,attitude towards own land,0.5,
+2023,0,3.75,51.75,NLD,796.7034,Farmer,attitude based on social learning,0.5,
+2023,3,4.75,51.75,NLD,1913.6667,Farmer,AFT ID,1.0,
+2023,3,4.75,51.75,NLD,1913.6667,Farmer,soil organic carbon,3959.595947265625,gC/m²
+2023,3,4.75,51.75,NLD,1913.6667,Farmer,average crop yield,89.02086639404297,gC/m²
+2023,3,4.75,51.75,NLD,1913.6667,Farmer,agent tillage behaviour,1.0,
+2023,3,4.75,51.75,NLD,1913.6667,Farmer,perceived behavioural control,0.95,
+2023,3,4.75,51.75,NLD,1913.6667,Farmer,theory of planned behaviour,0.0,
+2023,3,4.75,51.75,NLD,1913.6667,Farmer,social norm,0.3543436937742045,
+2023,3,4.75,51.75,NLD,1913.6667,Farmer,attitude,0.5551527097196782,
+2023,3,4.75,51.75,NLD,1913.6667,Farmer,attitude towards own land,0.5,
+2023,3,4.75,51.75,NLD,1913.6667,Farmer,attitude based on social learning,0.5919211828661303,
+2023,6,4.75,53.25,NLD,184.8494,Farmer,AFT ID,0.0,
+2023,6,4.75,53.25,NLD,184.8494,Farmer,soil organic carbon,6348.86572265625,gC/m²
+2023,6,4.75,53.25,NLD,184.8494,Farmer,average crop yield,155.8218231201172,gC/m²
+2023,6,4.75,53.25,NLD,184.8494,Farmer,agent tillage behaviour,1.0,
+2023,6,4.75,53.25,NLD,184.8494,Farmer,perceived behavioural control,0.75,
+2023,6,4.75,53.25,NLD,184.8494,Farmer,theory of planned behaviour,0.0,
+2023,6,4.75,53.25,NLD,184.8494,Farmer,social norm,0.2689414213699951,
+2023,6,4.75,53.25,NLD,184.8494,Farmer,attitude,0.5,
+2023,6,4.75,53.25,NLD,184.8494,Farmer,attitude towards own land,0.5,
+2023,6,4.75,53.25,NLD,184.8494,Farmer,attitude based on social learning,0.5,
+2023,5,4.75,52.75,NLD,1123.6608,Farmer,AFT ID,0.0,
+2023,5,4.75,52.75,NLD,1123.6608,Farmer,soil organic carbon,3675.283447265625,gC/m²
+2023,5,4.75,52.75,NLD,1123.6608,Farmer,average crop yield,260.4924621582031,gC/m²
+2023,5,4.75,52.75,NLD,1123.6608,Farmer,agent tillage behaviour,1.0,
+2023,5,4.75,52.75,NLD,1123.6608,Farmer,perceived behavioural control,0.75,
+2023,5,4.75,52.75,NLD,1123.6608,Farmer,theory of planned behaviour,0.0,
+2023,5,4.75,52.75,NLD,1123.6608,Farmer,social norm,0.3543436937742045,
+2023,5,4.75,52.75,NLD,1123.6608,Farmer,attitude,0.42783690004819763,
+2023,5,4.75,52.75,NLD,1123.6608,Farmer,attitude towards own land,0.5,
+2023,5,4.75,52.75,NLD,1123.6608,Farmer,attitude based on social learning,0.3195922501204941,
+2023,15,6.25,52.25,NLD,1892.4104,Farmer,AFT ID,1.0,
+2023,15,6.25,52.25,NLD,1892.4104,Farmer,soil organic carbon,7666.1962890625,gC/m²
+2023,15,6.25,52.25,NLD,1892.4104,Farmer,average crop yield,135.48171997070312,gC/m²
+2023,15,6.25,52.25,NLD,1892.4104,Farmer,agent tillage behaviour,1.0,
+2023,15,6.25,52.25,NLD,1892.4104,Farmer,perceived behavioural control,0.95,
+2023,15,6.25,52.25,NLD,1892.4104,Farmer,theory of planned behaviour,0.0,
+2023,15,6.25,52.25,NLD,1892.4104,Farmer,social norm,0.2689414213699951,
+2023,15,6.25,52.25,NLD,1892.4104,Farmer,attitude,0.5,
+2023,15,6.25,52.25,NLD,1892.4104,Farmer,attitude towards own land,0.5,
+2023,15,6.25,52.25,NLD,1892.4104,Farmer,attitude based on social learning,0.5,
+2023,14,5.75,53.25,NLD,1333.4806,Farmer,AFT ID,0.0,
+2023,14,5.75,53.25,NLD,1333.4806,Farmer,soil organic carbon,4086.015625,gC/m²
+2023,14,5.75,53.25,NLD,1333.4806,Farmer,average crop yield,161.19223022460938,gC/m²
+2023,14,5.75,53.25,NLD,1333.4806,Farmer,agent tillage behaviour,1.0,
+2023,14,5.75,53.25,NLD,1333.4806,Farmer,perceived behavioural control,0.75,
+2023,14,5.75,53.25,NLD,1333.4806,Farmer,theory of planned behaviour,0.0,
+2023,14,5.75,53.25,NLD,1333.4806,Farmer,social norm,0.2689414213699951,
+2023,14,5.75,53.25,NLD,1333.4806,Farmer,attitude,0.5,
+2023,14,5.75,53.25,NLD,1333.4806,Farmer,attitude towards own land,0.5,
+2023,14,5.75,53.25,NLD,1333.4806,Farmer,attitude based on social learning,0.5,
+2023,17,6.25,53.25,NLD,1560.0781,Farmer,AFT ID,0.0,
+2023,17,6.25,53.25,NLD,1560.0781,Farmer,soil organic carbon,8351.4443359375,gC/m²
+2023,17,6.25,53.25,NLD,1560.0781,Farmer,average crop yield,164.3465576171875,gC/m²
+2023,17,6.25,53.25,NLD,1560.0781,Farmer,agent tillage behaviour,1.0,
+2023,17,6.25,53.25,NLD,1560.0781,Farmer,perceived behavioural control,0.75,
+2023,17,6.25,53.25,NLD,1560.0781,Farmer,theory of planned behaviour,0.0,
+2023,17,6.25,53.25,NLD,1560.0781,Farmer,social norm,0.2689414213699951,
+2023,17,6.25,53.25,NLD,1560.0781,Farmer,attitude,0.5,
+2023,17,6.25,53.25,NLD,1560.0781,Farmer,attitude towards own land,0.5,
+2023,17,6.25,53.25,NLD,1560.0781,Farmer,attitude based on social learning,0.5,
+2023,11,5.75,51.75,NLD,1913.6667,Farmer,AFT ID,0.0,
+2023,11,5.75,51.75,NLD,1913.6667,Farmer,soil organic carbon,3743.85595703125,gC/m²
+2023,11,5.75,51.75,NLD,1913.6667,Farmer,average crop yield,100.33753967285156,gC/m²
+2023,11,5.75,51.75,NLD,1913.6667,Farmer,agent tillage behaviour,1.0,
+2023,11,5.75,51.75,NLD,1913.6667,Farmer,perceived behavioural control,0.75,
+2023,11,5.75,51.75,NLD,1913.6667,Farmer,theory of planned behaviour,0.0,
+2023,11,5.75,51.75,NLD,1913.6667,Farmer,social norm,0.3543436937742045,
+2023,11,5.75,51.75,NLD,1913.6667,Farmer,attitude,0.5362277603713004,
+2023,11,5.75,51.75,NLD,1913.6667,Farmer,attitude towards own land,0.5,
+2023,11,5.75,51.75,NLD,1913.6667,Farmer,attitude based on social learning,0.5905694009282509,
+2023,4,4.75,52.25,NLD,1831.8278,Farmer,AFT ID,0.0,
+2023,4,4.75,52.25,NLD,1831.8278,Farmer,soil organic carbon,4216.84521484375,gC/m²
+2023,4,4.75,52.25,NLD,1831.8278,Farmer,average crop yield,144.91209411621094,gC/m²
+2023,4,4.75,52.25,NLD,1831.8278,Farmer,agent tillage behaviour,1.0,
+2023,4,4.75,52.25,NLD,1831.8278,Farmer,perceived behavioural control,0.75,
+2023,4,4.75,52.25,NLD,1831.8278,Farmer,theory of planned behaviour,0.0,
+2023,4,4.75,52.25,NLD,1831.8278,Farmer,social norm,0.3392436312341828,
+2023,4,4.75,52.25,NLD,1831.8278,Farmer,attitude,0.46963406462206575,
+2023,4,4.75,52.25,NLD,1831.8278,Farmer,attitude towards own land,0.5,
+2023,4,4.75,52.25,NLD,1831.8278,Farmer,attitude based on social learning,0.4240851615551644,
+2023,2,4.25,52.25,NLD,416.8699,Farmer,AFT ID,0.0,
+2023,2,4.25,52.25,NLD,416.8699,Farmer,soil organic carbon,2954.053466796875,gC/m²
+2023,2,4.25,52.25,NLD,416.8699,Farmer,average crop yield,42.543113708496094,gC/m²
+2023,2,4.25,52.25,NLD,416.8699,Farmer,agent tillage behaviour,1.0,
+2023,2,4.25,52.25,NLD,416.8699,Farmer,perceived behavioural control,0.75,
+2023,2,4.25,52.25,NLD,416.8699,Farmer,theory of planned behaviour,0.0,
+2023,2,4.25,52.25,NLD,416.8699,Farmer,social norm,0.2689414213699951,
+2023,2,4.25,52.25,NLD,416.8699,Farmer,attitude,0.5,
+2023,2,4.25,52.25,NLD,416.8699,Farmer,attitude towards own land,0.5,
+2023,2,4.25,52.25,NLD,416.8699,Farmer,attitude based on social learning,0.5,
+2023,18,6.75,52.25,NLD,1892.4104,Farmer,AFT ID,0.0,
+2023,18,6.75,52.25,NLD,1892.4104,Farmer,soil organic carbon,8061.337890625,gC/m²
+2023,18,6.75,52.25,NLD,1892.4104,Farmer,average crop yield,115.53648376464844,gC/m²
+2023,18,6.75,52.25,NLD,1892.4104,Farmer,agent tillage behaviour,1.0,
+2023,18,6.75,52.25,NLD,1892.4104,Farmer,perceived behavioural control,0.75,
+2023,18,6.75,52.25,NLD,1892.4104,Farmer,theory of planned behaviour,0.0,
+2023,18,6.75,52.25,NLD,1892.4104,Farmer,social norm,0.2689414213699951,
+2023,18,6.75,52.25,NLD,1892.4104,Farmer,attitude,0.5,
+2023,18,6.75,52.25,NLD,1892.4104,Farmer,attitude towards own land,0.5,
+2023,18,6.75,52.25,NLD,1892.4104,Farmer,attitude based on social learning,0.5,
+2023,13,5.75,52.75,NLD,1871.01,Farmer,AFT ID,0.0,
+2023,13,5.75,52.75,NLD,1871.01,Farmer,soil organic carbon,4061.47607421875,gC/m²
+2023,13,5.75,52.75,NLD,1871.01,Farmer,average crop yield,144.39971923828125,gC/m²
+2023,13,5.75,52.75,NLD,1871.01,Farmer,agent tillage behaviour,1.0,
+2023,13,5.75,52.75,NLD,1871.01,Farmer,perceived behavioural control,0.75,
+2023,13,5.75,52.75,NLD,1871.01,Farmer,theory of planned behaviour,0.0,
+2023,13,5.75,52.75,NLD,1871.01,Farmer,social norm,0.32865254651727005,
+2023,13,5.75,52.75,NLD,1871.01,Farmer,attitude,0.47311952189308165,
+2023,13,5.75,52.75,NLD,1871.01,Farmer,attitude towards own land,0.5,
+2023,13,5.75,52.75,NLD,1871.01,Farmer,attitude based on social learning,0.4327988047327041,
+2023,8,5.25,52.25,NLD,1892.4104,Farmer,AFT ID,0.0,
+2023,8,5.25,52.25,NLD,1892.4104,Farmer,soil organic carbon,4276.0,gC/m²
+2023,8,5.25,52.25,NLD,1892.4104,Farmer,average crop yield,116.17891693115234,gC/m²
+2023,8,5.25,52.25,NLD,1892.4104,Farmer,agent tillage behaviour,0.0,
+2023,8,5.25,52.25,NLD,1892.4104,Farmer,perceived behavioural control,0.75,
+2023,8,5.25,52.25,NLD,1892.4104,Farmer,theory of planned behaviour,0.0,
+2023,8,5.25,52.25,NLD,1892.4104,Farmer,social norm,0.7310585786300049,
+2023,8,5.25,52.25,NLD,1892.4104,Farmer,attitude,0.5286493040980388,
+2023,8,5.25,52.25,NLD,1892.4104,Farmer,attitude towards own land,0.5,
+2023,8,5.25,52.25,NLD,1892.4104,Farmer,attitude based on social learning,0.5716232602450969,
+2023,10,5.75,51.25,NLD,1934.7773,Farmer,AFT ID,0.0,
+2023,10,5.75,51.25,NLD,1934.7773,Farmer,soil organic carbon,7452.306640625,gC/m²
+2023,10,5.75,51.25,NLD,1934.7773,Farmer,average crop yield,52.05166244506836,gC/m²
+2023,10,5.75,51.25,NLD,1934.7773,Farmer,agent tillage behaviour,1.0,
+2023,10,5.75,51.25,NLD,1934.7773,Farmer,perceived behavioural control,0.75,
+2023,10,5.75,51.25,NLD,1934.7773,Farmer,theory of planned behaviour,0.0,
+2023,10,5.75,51.25,NLD,1934.7773,Farmer,social norm,0.2689414213699951,
+2023,10,5.75,51.25,NLD,1934.7773,Farmer,attitude,0.5,
+2023,10,5.75,51.25,NLD,1934.7773,Farmer,attitude towards own land,0.5,
+2023,10,5.75,51.25,NLD,1934.7773,Farmer,attitude based on social learning,0.5,
+2023,20,6.75,53.25,NLD,1565.0182,Farmer,AFT ID,0.0,
+2023,20,6.75,53.25,NLD,1565.0182,Farmer,soil organic carbon,7152.6044921875,gC/m²
+2023,20,6.75,53.25,NLD,1565.0182,Farmer,average crop yield,152.10992431640625,gC/m²
+2023,20,6.75,53.25,NLD,1565.0182,Farmer,agent tillage behaviour,1.0,
+2023,20,6.75,53.25,NLD,1565.0182,Farmer,perceived behavioural control,0.75,
+2023,20,6.75,53.25,NLD,1565.0182,Farmer,theory of planned behaviour,0.0,
+2023,20,6.75,53.25,NLD,1565.0182,Farmer,social norm,0.2689414213699951,
+2023,20,6.75,53.25,NLD,1565.0182,Farmer,attitude,0.5,
+2023,20,6.75,53.25,NLD,1565.0182,Farmer,attitude towards own land,0.5,
+2023,20,6.75,53.25,NLD,1565.0182,Farmer,attitude based on social learning,0.5,
+2023,12,5.75,52.25,NLD,1892.4104,Farmer,AFT ID,0.0,
+2023,12,5.75,52.25,NLD,1892.4104,Farmer,soil organic carbon,8221.8740234375,gC/m²
+2023,12,5.75,52.25,NLD,1892.4104,Farmer,average crop yield,83.71598815917969,gC/m²
+2023,12,5.75,52.25,NLD,1892.4104,Farmer,agent tillage behaviour,1.0,
+2023,12,5.75,52.25,NLD,1892.4104,Farmer,perceived behavioural control,0.75,
+2023,12,5.75,52.25,NLD,1892.4104,Farmer,theory of planned behaviour,0.0,
+2023,12,5.75,52.25,NLD,1892.4104,Farmer,social norm,0.3392436312341828,
+2023,12,5.75,52.25,NLD,1892.4104,Farmer,attitude,0.5235403923990858,
+2023,12,5.75,52.25,NLD,1892.4104,Farmer,attitude towards own land,0.5,
+2023,12,5.75,52.25,NLD,1892.4104,Farmer,attitude based on social learning,0.5588509809977145,
+2023,16,6.25,52.75,NLD,1871.01,Farmer,AFT ID,1.0,
+2023,16,6.25,52.75,NLD,1871.01,Farmer,soil organic carbon,8097.33447265625,gC/m²
+2023,16,6.25,52.75,NLD,1871.01,Farmer,average crop yield,141.97091674804688,gC/m²
+2023,16,6.25,52.75,NLD,1871.01,Farmer,agent tillage behaviour,1.0,
+2023,16,6.25,52.75,NLD,1871.01,Farmer,perceived behavioural control,0.95,
+2023,16,6.25,52.75,NLD,1871.01,Farmer,theory of planned behaviour,0.0,
+2023,16,6.25,52.75,NLD,1871.01,Farmer,social norm,0.2689414213699951,
+2023,16,6.25,52.75,NLD,1871.01,Farmer,attitude,0.5,
+2023,16,6.25,52.75,NLD,1871.01,Farmer,attitude towards own land,0.5,
+2023,16,6.25,52.75,NLD,1871.01,Farmer,attitude based on social learning,0.5,
+2023,1,4.25,51.75,NLD,1858.5349,Farmer,AFT ID,1.0,
+2023,1,4.25,51.75,NLD,1858.5349,Farmer,soil organic carbon,3556.206787109375,gC/m²
+2023,1,4.25,51.75,NLD,1858.5349,Farmer,average crop yield,80.54728698730469,gC/m²
+2023,1,4.25,51.75,NLD,1858.5349,Farmer,agent tillage behaviour,1.0,
+2023,1,4.25,51.75,NLD,1858.5349,Farmer,perceived behavioural control,0.95,
+2023,1,4.25,51.75,NLD,1858.5349,Farmer,theory of planned behaviour,0.0,
+2023,1,4.25,51.75,NLD,1858.5349,Farmer,social norm,0.2689414213699951,
+2023,1,4.25,51.75,NLD,1858.5349,Farmer,attitude,0.5,
+2023,1,4.25,51.75,NLD,1858.5349,Farmer,attitude towards own land,0.5,
+2023,1,4.25,51.75,NLD,1858.5349,Farmer,attitude based on social learning,0.5,
+2023,7,5.25,51.75,NLD,1913.6667,Farmer,AFT ID,0.0,
+2023,7,5.25,51.75,NLD,1913.6667,Farmer,soil organic carbon,3772.161376953125,gC/m²
+2023,7,5.25,51.75,NLD,1913.6667,Farmer,average crop yield,113.64781951904297,gC/m²
+2023,7,5.25,51.75,NLD,1913.6667,Farmer,agent tillage behaviour,1.0,
+2023,7,5.25,51.75,NLD,1913.6667,Farmer,perceived behavioural control,0.75,
+2023,7,5.25,51.75,NLD,1913.6667,Farmer,theory of planned behaviour,0.0,
+2023,7,5.25,51.75,NLD,1913.6667,Farmer,social norm,0.3392436312341828,
+2023,7,5.25,51.75,NLD,1913.6667,Farmer,attitude,0.5142247767253161,
+2023,7,5.25,51.75,NLD,1913.6667,Farmer,attitude towards own land,0.5,
+2023,7,5.25,51.75,NLD,1913.6667,Farmer,attitude based on social learning,0.5355619418132901,
+2023,19,6.75,52.75,NLD,1871.01,Farmer,AFT ID,1.0,
+2023,19,6.75,52.75,NLD,1871.01,Farmer,soil organic carbon,7647.935546875,gC/m²
+2023,19,6.75,52.75,NLD,1871.01,Farmer,average crop yield,158.49420166015625,gC/m²
+2023,19,6.75,52.75,NLD,1871.01,Farmer,agent tillage behaviour,1.0,
+2023,19,6.75,52.75,NLD,1871.01,Farmer,perceived behavioural control,0.95,
+2023,19,6.75,52.75,NLD,1871.01,Farmer,theory of planned behaviour,0.0,
+2023,19,6.75,52.75,NLD,1871.01,Farmer,social norm,0.2689414213699951,
+2023,19,6.75,52.75,NLD,1871.01,Farmer,attitude,0.5,
+2023,19,6.75,52.75,NLD,1871.01,Farmer,attitude towards own land,0.5,
+2023,19,6.75,52.75,NLD,1871.01,Farmer,attitude based on social learning,0.5,

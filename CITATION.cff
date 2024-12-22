@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: If you use this software, please cite it using the metadata from this file.
+type: software
+title: 'odels build around LPJmL based on the copan:LPJmL modeling framework'
+version: 0.1.0
+date-released: '2024-12-18'
+abstract: x
+authors:
+- family-names: Breier
+  given-names: Jannes
+  email: jannesbr@pik-potsdam.de
+  orcid: 0000-0002-9055-6904
+
+
+license: AGPL-3.0
+repository-code: https://github.com/jannesbr/inseeds
+doi: x
+

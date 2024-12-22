@@ -1,0 +1,12 @@
+# Settings for LPJmL specifically for coupling (pycoupler)
+#   (not covered by LPJmL's direct config)
+lpjml_settings:
+    country_code_to_name: true
+    iso_country_code: true
+
+# Define which farmer variables map with coupled LPJmL input variables
+coupling_map:
+    tillage: ["sdate", "crop_phu"]
+    # residues: ["residue_on_field"]
+
+control_run: False
