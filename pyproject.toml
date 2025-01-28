@@ -4,12 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pymodels"
-version = "0.1.0"
+version = "0.1.1"
 description = "Models build around LPJmL based on the copan:LPJmL modeling framework"
 readme = "README.md"
 license = {file = "LICENSE.md"}
 authors = [
-    { name = "Jannes Breier", email = "jannes.breier@pik-potsdam.de" },
+    { name = "Jannes Breier", email = "jannes.breier@pik-potsdam.de" }
+]
 requires-python = ">=3.9"
 keywords = ["DGVM", "ABM", "LPJmL", "copan:CORE"]
 classifiers = [

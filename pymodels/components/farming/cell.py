@@ -27,11 +27,10 @@ class Cell(lpjml.Cell, base.Cell):
         self.landuse_previous = self.landuse
         self.is_landuse_previous = self.is_landuse
 
-
     @property
     def landuse(self):
         """Get land use of the cell."""
-        return self.output.cftfrac.sum()
+        return self.input.landuse.isel(time=-1).sum()
 
     @property
     def is_landuse(self):
@@ -55,4 +54,3 @@ class Cell(lpjml.Cell, base.Cell):
         # update the average harvest date of the cell
         self.landuse_previous = self.landuse
         self.is_landuse_previous = self.is_landuse
-

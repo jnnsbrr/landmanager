@@ -7,16 +7,19 @@ from pymodels.components import lpjml
 
 class Farmer(crop_calendar.Farmer):
     """Farmer entity type."""
+
     pass
 
 
 class Cell(farming.Cell):
     """Cell entity type."""
+
     pass
 
 
-class World(lpjml.World, farming.World):
+class World(farming.World):
     """World entity type."""
+
     pass
 
 
@@ -42,7 +45,7 @@ class Model(lpjml.Component, farming.Component):
         self.world = World(
             model=self,
             input=self.lpjml.read_input(),
-            output=self.lpjml.read_historic_output().isel(time=[-1]),
+            output=self.lpjml.read_historic_output(),  # .isel(time=[-1]),
             grid=self.lpjml.grid,
             country=self.lpjml.country,
             area=self.lpjml.terr_area,

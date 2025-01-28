@@ -14,6 +14,7 @@ import numpy as np
 import pycopancore.model_components.base as core
 from pymodels.components import base
 
+
 class Farmer(core.Individual, base.Individual):
     """Farmer (Individual) entity type mixin class."""
 
@@ -31,6 +32,9 @@ class Farmer(core.Individual, base.Individual):
 
         # Same applies for cropyield (as for soilc)
         self.cropyield = self.cell_cropyield
+
+        # initialize previous cropyield
+        self.cropyield_previous = self.cropyield
 
     def init_coupled_attributes(self):
         """Initialize the mapped variables from the LPJmL output to the farmers"""

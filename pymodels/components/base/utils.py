@@ -1,6 +1,7 @@
 import pandas as pd
 import importlib.resources as pkg_resources
 
+
 def load_csv(file_path: str) -> pd.DataFrame:
     """
     Load a CSV file as a Pandas DataFrame from the library's data folder.
@@ -12,7 +13,7 @@ def load_csv(file_path: str) -> pd.DataFrame:
     """
     # Split the file_path into parts
     parts = file_path.strip("/").split("/")
-    
+
     # Extract the package (subfolder) and file name
     if len(parts) == 1:
         package, file_name = "pymodels.data", parts[0]

@@ -1,6 +1,8 @@
 """The inseeds_farmer_mnagement.world class.
 """
+
 from pymodels.components import base
+import pycopanlpjml as lpjml
 
 
 # This file is part of pycopancore.
@@ -13,7 +15,7 @@ from pymodels.components import base
 # License: BSD 2-clause license
 
 
-class World(base.World):
+class World(lpjml.World, base.World):
     """World entity type mixin class."""
 
     def __init__(self, **kwargs):

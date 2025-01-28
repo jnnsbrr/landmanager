@@ -36,7 +36,11 @@ config_coupled.set_coupled(
     start_year=2001,
     end_year=2100,
     coupled_year=2023,
-    coupled_input=["sdate", "crop_phu"],  # residue_on_field
+    coupled_input=[
+        "sdate",
+        "crop_phu",
+        "landuse"
+    ],  # residue_on_field
     coupled_output=[
         "temp",
         "prec",
@@ -56,7 +60,7 @@ config_coupled.set_coupled(
 )
 
 # only for single cells runs
-config_coupled.outputyear = 2022
+config_coupled.outputyear = 2003
 
 config_coupled.fix_co2 = True
 config_coupled.fix_co2_year = 2022
@@ -84,11 +88,12 @@ config_coupled_fn = config_coupled.to_json()
 # Simulations =============================================================== #
 
 # check if everything is set correct
-check_lpjml(config_coupled_fn)
+# check_lpjml(config_coupled_fn)
 
 # run lpjml simulation for coupling in the background
 run_lpjml(
-    config_file=config_coupled_fn, std_to_file=False  # write stdout and stderr to file
+    config_file=config_coupled_fn,
+    std_to_file=False  # write stdout and stderr to file
 )
 
 # pymodels run --------------------------------------------------------------- #

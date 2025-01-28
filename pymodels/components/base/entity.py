@@ -10,7 +10,7 @@ class Entity:
 
     output_variables = Output()
 
-    def __init__(self, model=None):
+    def __init__(self, model=None, **kwargs):
         """Initialize an instance of World."""
         self.model = model
 
