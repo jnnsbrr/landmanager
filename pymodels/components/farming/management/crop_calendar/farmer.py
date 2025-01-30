@@ -64,6 +64,11 @@ class CellActivity:
         """
         self._cell = cell
 
+        # basic time variables
+        self.ndays_year = 365
+        self.midday = get_midday()
+
+
     @property
     def cell(self):
         return self._cell
@@ -90,6 +95,29 @@ class Crop(CellActivity):
             .squeeze()
             .to_dict()
         )
+
+        # initiate calculation of the sowing date (calc_sowing_date)
+        self.sdate = None
+        self.smonth = None
+        self.sseason = None
+
+        # initiate calculation of the harvest rule (calc_harvest_rule)
+        self.harvest_rule = None
+        self.harvest_rule_name = None
+
+        # initiate calculation of the harvest options (calc_harvest_options)
+        self.hdate_first = None
+        self.hdate_maxrp = None
+        self.hdate_last = None
+        self.hdate_wetseas = None
+        self.hdate_temp_base = None
+        self.hdate_temp_opt = None
+
+        # initiate calculation of the harvest date (calc_harvest_date)
+        self.hdate_rf = None
+        self.hdate_ir = None
+        self.hreason_rf = None
+        self.hreason_ir = None
 
     @property
     def is_winter_crop(self, temperate_cereals_only=True):
@@ -149,7 +177,6 @@ class Crop(CellActivity):
         :type seasonality: str
 
         """
-        midday = get_midday()
         lat = self.cell.grid.lat.item()
 
         # Constrain first possible date for winter crop sowing
@@ -165,7 +192,7 @@ class Crop(CellActivity):
             # "Warm winter" (allowing non-vernalizing winter-sown crops)
             # sowing 2.5 months before coldest midday
             # it seems a good approximation for both India and South US)
-            coldestday = midday[np.argmin(monthly_climate["temp"].values)]
+            coldestday = self.midday[np.argmin(monthly_climate["temp"].values)]
             firstwinterdoy = (
                 coldestday - 75 if coldestday - 75 > 0 else coldestday - 75 + 365
             )
@@ -200,48 +227,47 @@ class Crop(CellActivity):
         if self.calcmethod_sdate == "WTYP_CALC_SDATE":
 
             if firstwinterdoy > earliest_sdate and firstwintermonth != default_month:
-                sowing_month = firstwintermonth
-                sowing_doy = firstwinterdoy
-                sowing_season = "winter"
+                smonth = firstwintermonth
+                sdate = firstwinterdoy
+                sseason = "winter"
 
             elif (
                 firstwinterdoy <= earliest_sdate
                 and min(monthly_climate["temp"]) > temp_fall
                 and firstwintermonth != default_month
             ):
-                sowing_month = earliest_smonth
-                sowing_doy = earliest_sdate
-                sowing_season = "winter"
+                smonth = earliest_smonth
+                sdate = earliest_sdate
+                sseason = "winter"
 
             else:
-                sowing_month = firstspringmonth
-                sowing_doy = firstspringdoy
-                sowing_season = "spring"
+                smonth = firstspringmonth
+                sdate = firstspringdoy
+                sseason = "spring"
 
         else:
             if seasonality == "NO_SEASONALITY":
-                sowing_month = default_month
-                sowing_doy = default_doy
-                sowing_season = "spring"
+                smonth = default_month
+                sdate = default_doy
+                sseason = "spring"
 
             elif seasonality in ["PREC", "PRECTEMP"]:
-                sowing_doy = calcDoyWetMonth(monthly_climate["pet"])
-                sowing_month = doy2month(sowing_doy)
-                sowing_season = "spring"
+                sdate = calcDoyWetMonth(monthly_climate["ppet"])
+                smonth = doy2month(sdate)
+                sseason = "spring"
 
             else:
-                sowing_month = firstspringmonth
-                sowing_doy = firstspringdoy
-                sowing_season = "spring"
+                smonth = firstspringmonth
+                sdate = firstspringdoy
+                sseason = "spring"
 
-        sowing_doy = default_doy if sowing_month == default_month else sowing_doy
-        sowing_month = (
+        self.sdate = default_doy if smonth == default_month else sdate
+        self.smonth = (
             default_month
-            if self.calcmethod_sdate == "WTYP_CALC_SDATE" and sowing_season == "spring"
-            else sowing_month
+            if self.calcmethod_sdate == "WTYP_CALC_SDATE" and sseason == "spring"
+            else smonth
         )
-
-        return sowing_doy, sowing_month, sowing_season
+        self.sseason = sseason
 
     def calc_harvest_rule(self, monthly_climate, seasonality):
         """
@@ -299,125 +325,206 @@ class Crop(CellActivity):
                 harvest_rule = 9
                 harvest_rule_name = "t-high_mix-seas"
 
-        return harvest_rule, harvest_rule_name
+        self.harvest_rule = harvest_rule
+        self.harvest_rule_name = harvest_rule_name
 
-    def calc_harvest_date_vector(self, monthly_climate, sowing_date, sowing_season):
+    def calc_harvest_options(self, monthly_climate):
         """
         Calculate harvest date vector.
 
         :param monthly_climate: Dict of arrays of monthly temperatures.
         :type monthly_climate: dict
-        :param sowing_date: Sowing date (DOY).
-        :type sowing_date: int
-        :param sowing_season: Sowing season.
-        :type sowing_season: str
-        :return: Harvest date vector.
-        :rtype: dict
         """
 
-        ndays_year = 365
-        midday = get_midday()
-
         # Shortest cycle: crop lower biological limit
-        hd_first = sowing_date + self.min_growingseason
+        hdate_first = self.sdate + self.min_growingseason
         # Medium cycle: best trade-off vegetative and reproductive growth
-        hd_maxrp = sowing_date + self.maxrp_growingseason
+        hdate_maxrp = self.sdate + self.maxrp_growingseason
         # Longest cycle: crop upper biological limit
-        hd_last = sowing_date + (
+        hdate_last = self.sdate + (
             self.max_growingseason_wt
-            if sowing_season == "winter"
+            if self.sseason == "winter"
             else self.max_growingseason_st
         )
 
         # End of wet season
-        doy_wet1 = calc_doy_cross_threshold(monthly_climate["pet"], self.pet_ratio)[
+        doy_wet1 = calc_doy_cross_threshold(monthly_climate["ppet"], self.ppet_ratio)[
             "doy_cross_down"
         ]
         doy_wet2 = calc_doy_cross_threshold(
-            monthly_climate["pet_diff"], self.pet_ratio_diff
+            monthly_climate["ppet_diff"], self.ppet_ratio_diff
         )["doy_cross_down"]
         doy_wet_vec = [
-            doy + ndays_year if doy < sowing_date and doy != -9999 else doy
+            doy + self.ndays_year if doy < self.sdate and doy != -9999 else doy
             for doy in [doy_wet1, doy_wet2]
         ]
         doy_wet_first = min([doy for doy in doy_wet_vec if doy != -9999], default=-9999)
-        hd_wetseas = (
-            hd_last
-            if doy_wet1 == -9999 and min(monthly_climate["pet"]) < self.pet_min
+        hdate_wetseas = (
+            hdate_last
+            if doy_wet1 == -9999 and min(monthly_climate["ppet"]) < self.ppet_min
             else doy_wet_first + self.rphase_duration
         )
 
         # Warmest day of the year
-        warmest_day = midday[monthly_climate["temp"].argmax()]
-        hd_temp_base = (
+        warmest_day = self.midday[monthly_climate["temp"].argmax()]
+        hdate_temp_base = (
             warmest_day
-            if sowing_season == "winter"
+            if self.sseason == "winter"
             else warmest_day + self.rphase_duration
         )
 
         # First hot day
-        doy_exceed_opt_rp = calc_doy_cross_threshold(monthly_climate["temp"], self.temp_opt_rphase)[
-            "doy_cross_up"
-        ]
-        breakpoint()
-        doy_exceed_opt_rp = sorted([doy + ndays_year if doy < sowing_date and doy != -9999 else doy for doy in doy_exceed_opt_rp])
+        doy_exceed_opt_rp = calc_doy_cross_threshold(
+            monthly_climate["temp"], 
+            self.temp_opt_rphase
+        )["doy_cross_up"]
+        doy_exceed_opt_rp = doy_exceed_opt_rp + self.ndays_year if doy_exceed_opt_rp < self.sdate and doy_exceed_opt_rp != -9999 else doy_exceed_opt_rp
 
         # Last hot day
         doy_below_opt_rp = calc_doy_cross_threshold(monthly_climate["temp"], self.temp_opt_rphase)[
             "doy_cross_down"
         ]
-        doy_below_opt_rp = sorted(
-            [
-                doy + ndays_year if doy < sowing_date and doy != -9999 else doy
-                for doy in doy_below_opt_rp
-            ]
-        )[0]
+        doy_below_opt_rp = doy_below_opt_rp + self.ndays_year if doy_below_opt_rp < self.sdate and doy_below_opt_rp != -9999 else doy_below_opt_rp
 
         # Winter type: First hot day; Spring type: Last hot day
         doy_opt_rp = (
-            doy_exceed_opt_rp if sowing_season == "winter" else doy_below_opt_rp
+            doy_exceed_opt_rp if self.sseason == "winter" else doy_below_opt_rp
         )
-        hd_temp_opt = (
-            hd_maxrp
+        hdate_temp_opt = (
+            hdate_maxrp
             if doy_opt_rp == -9999
-            else doy_opt_rp + (self.rphase_duration if sowing_season != "winter" else 0)
+            else doy_opt_rp + (self.rphase_duration if self.sseason != "winter" else 0)
         )
 
+        self.hdate_first = hdate_first
+        self.hdate_maxrp = hdate_maxrp
+        self.hdate_last = hdate_last
         # If harvest date < sowing date, it occurs the following year, so add 365 days
-        hd_wetseas = hd_wetseas + ndays_year if hd_wetseas < sowing_date else hd_wetseas
-        hd_temp_base = (
-            hd_temp_base + ndays_year if hd_temp_base < sowing_date else hd_temp_base
+        self.hdate_wetseas = hdate_wetseas + self.ndays_year if hdate_wetseas < self.sdate else hdate_wetseas
+        self.hdate_temp_base = (
+            hdate_temp_base + self.ndays_year if hdate_temp_base < self.sdate else hdate_temp_base
         )
-        hd_temp_opt = (
-            hd_temp_opt + ndays_year if hd_temp_opt < sowing_date else hd_temp_opt
+        self.hdate_temp_opt = (
+            hdate_temp_opt + self.ndays_year if hdate_temp_opt < self.sdate else hdate_temp_opt
         )
 
-        # Harvest date vector
-        hd_vector = {
-            "hd_first": hd_first,
-            "hd_maxrp": hd_maxrp,
-            "hd_last": hd_last,
-            "hd_wetseas": hd_wetseas,
-            "hd_temp_base": hd_temp_base,
-            "hd_temp_opt": hd_temp_opt,
-        }
+    def calc_harvest_date(
+        self,
+        monthly_climate,
+        seasonality
+    ):
+        """
+        Calculate harvest date (Minoli et al., 2019).
 
-        return hd_vector
+        Rule-based estimation of the end of the crop growing period (date of
+        physiological maturity), here called harvest date for simplicity.
+        The assumption behind these rules is that farmers select growing seasons
+        based on the mean climatic characteristics of the location in
+        which they operate and on the physiological limitations (base and optimum
+        temperatures for reproductive growth; sensitivity to terminal water stress)
+        of the respective crop species.
 
-    def calc_phu(self, monthly_climate, vern_factor=None, phen_model="t"):
+        :param monthly_climate: Dict of arrays of monthly temperatures.
+        :type monthly_climate: dict
+
+        """
+
+        if seasonality == "NO_SEASONALITY":
+
+            if self.harvest_rule == 1:
+                hdate_rf = self.hdate_first
+                hdate_ir = self.hdate_first
+                hreason_rf = hreason_ir = "hdate_first"
+            else:
+                hdate_rf = self.hdate_maxrp
+                hdate_ir = self.hdate_maxrp
+                hreason_rf = hreason_ir = "hdate_maxrp"
+
+        elif seasonality == "PREC":
+
+            if self.harvest_rule == 2:
+                hdate_rf = self.hdate_first
+                hdate_ir = self.hdate_first
+                hreason_rf = hreason_ir = "hdate_first"
+            else:
+                hdate_rf = min(max(self.hdate_first, self.hdate_wetseas), self.hdate_maxrp)
+                hdate_ir = self.hdate_maxrp
+                hreason_rf = "hdate_wetseas" if hdate_rf == self.hdate_wetseas else "hdate_maxrp"
+                hreason_ir = "hdate_maxrp"
+
+        else:
+            if self.sseason == "winter":
+
+                if self.harvest_rule == 3:
+                    hdate_rf = self.hdate_first
+                    hdate_ir = self.hdate_first
+                    hreason_rf = hreason_ir = "hdate_first"
+                elif self.harvest_rule == 6:
+                    if self.smonth == 0 and max(monthly_climate["temp"]) < self.temp_fall:
+                        hdate_rf = self.hdate_first
+                        hdate_ir = self.hdate_first
+                        hreason_rf = hreason_ir = "hdate_first"
+                    else:
+                        hdate_rf = min(max(self.hdate_first, self.hdate_temp_base), self.hdate_last)
+                        hdate_ir = min(max(self.hdate_first, self.hdate_temp_base), self.hdate_last)
+                        hreason_rf = "hdate_temp_base" if hdate_rf == self.hdate_temp_base else "hdate_last"
+                        hreason_ir = "hdate_temp_base" if hdate_ir == self.hdate_temp_base else "hdate_last"
+                else:
+                    hdate_rf = min(max(self.hdate_first, self.hdate_temp_opt), self.hdate_last)
+                    hdate_ir = min(max(self.hdate_first, self.hdate_temp_opt), self.hdate_last)
+                    hreason_rf = "hdate_temp_opt" if hdate_rf == self.hdate_temp_opt else "hdate_last"
+                    hreason_ir = "hdate_temp_opt" if hdate_ir == self.hdate_temp_opt else "hdate_last"
+
+            else:
+
+                if self.harvest_rule == 3:
+                    hdate_rf = self.hdate_first
+                    hdate_ir = self.hdate_first
+                    hreason_rf = hreason_ir = "hdate_first"
+                elif self.harvest_rule == 6:
+                    if self.smonth == 0 and max(monthly_climate["temp"]) < self.temp_spring:
+                        hdate_rf = self.hdate_first
+                        hdate_ir = self.hdate_first
+                        hreason_rf = hreason_ir = "hdate_first"
+                    elif seasonality == "PRECTEMP":
+                        hdate_rf = min(max(self.hdate_first, self.hdate_wetseas), self.hdate_maxrp)
+                        hdate_ir = self.hdate_maxrp
+                        hreason_rf = "hdate_wetseas" if hdate_rf == self.hdate_wetseas else "hdate_maxrp"
+                        hreason_ir = "hdate_maxrp"
+                    else:
+                        hdate_rf = min(max(self.hdate_first, self.hdate_temp_base), max(self.hdate_first, self.hdate_wetseas), self.hdate_last)
+                        hdate_ir = min(max(self.hdate_first, self.hdate_temp_base), self.hdate_last)
+                        hreason_rf = "hdate_temp_base" if hdate_rf == self.hdate_temp_base else "hdate_last"
+                        hreason_ir = "hdate_temp_base" if hdate_ir == self.hdate_temp_base else "hdate_last"
+                else:
+                    if seasonality == "PRECTEMP":
+                        hdate_rf = min(max(self.hdate_first, self.hdate_wetseas), self.hdate_maxrp)
+                        hdate_ir = self.hdate_maxrp
+                        hreason_rf = "hdate_wetseas" if hdate_rf == self.hdate_wetseas else "hdate_maxrp"
+                        hreason_ir = "hdate_maxrp"
+                    else:
+                        hdate_rf = min(max(self.hdate_first, self.hdate_temp_opt), max(self.hdate_first, self.hdate_wetseas), self.hdate_last)
+                        hdate_ir = min(max(self.hdate_first, self.hdate_temp_opt), self.hdate_last)
+                        hreason_rf = "hdate_temp_opt" if hdate_rf == self.hdate_temp_opt else "hdate_last"
+                        hreason_ir = "hdate_temp_opt" if hdate_ir == self.hdate_temp_opt else "hdate_last"
+
+
+        self.hdate_rf = hdate_rf if hdate_rf <= self.ndays_year else hdate_rf - self.ndays_year
+        self.hdate_ir = hdate_ir if hdate_ir <= self.ndays_year else hdate_ir - self.ndays_year
+        self.hreason_rf = hreason_rf
+        self.hreason_ir = hreason_ir
+
+
+    def calc_phu(self, monthly_climate, hdate, vern_factor=None, phen_model="t"):
         """
         Calculate PHU requirements.
 
-        :param sdate: Sowing date (DOY).
-        :type sdate: int
+        :param monthly_climate: Dict of arrays of monthly temperatures.
+        :type monthly_climate: dict
         :param hdate: Maturity date (DOY).
         :type hdate: int
-        :param mdt: Daily mean temperature, length should be 365.
-        :type mdt: list or numpy.ndarray
         :param vern_factor: Vernalization factor from calcVf(), length should be 365.
         :type vern_factor: list or numpy.ndarray
-        :param basetemp: Minimum cardinal temperature.
-        :type basetemp: float
         :param phen_model: Phenological model, one of "t", "tv", "tp", "tvp".
         :type phen_model: str
         :return: Total Thermal Unit Requirements.
@@ -429,22 +536,22 @@ class Crop(CellActivity):
         husum = 0
 
         # Select days not in growing period
-        hdate = hdate if sdate < hdate else hdate + 365
+        hdate = hdate if self.sdate < hdate else hdate + 365
         if hdate <= 365:
-            days_no_gp = list(range(1, sdate)) + list(range(hdate, 366))
+            days_no_gp = list(range(1, self.sdate)) + list(range(hdate, 366))
         else:
-            days_no_gp = list(range(hdate - 365, sdate))
+            days_no_gp = list(range(hdate - 365, self.sdate))
 
         # Compute Effective Thermal Units (teff)
         if phen_model == "t":
             teff = [
-                max(temp - self.basetemp, 0) if i not in days_no_gp else 0
-                for i, temp in enumerate(mdt, start=1)
+                max(temp - self.basetemp_low, 0) if i not in days_no_gp else 0
+                for i, temp in enumerate(mdt["y"], start=1)
             ]
         elif phen_model == "tv":
             teff = [
-                max(temp - self.basetemp, 0) * vf if i not in days_no_gp else 0
-                for i, (temp, vf) in enumerate(zip(mdt, vern_factor), start=1)
+                max(temp - self.basetemp_low, 0) * vf if i not in days_no_gp else 0
+                for i, (temp, vf) in enumerate(zip(mdt["y"], vern_factor), start=1)
             ]
         else:
             raise ValueError("Error: phen_model not declared!")
@@ -556,12 +663,13 @@ class CultivatedCrops(CellActivity):
         prec = self.var("prec", avg="monthly")
 
         # average temperature of the cell
-        pet = self.var("pet", avg="monthly")
+        ppet = (self.var("prec") / self.var("pet")).mean("time")
 
         # average potential evaporation of the cell
-        pet_diff = pet - self.var("pet", avg="monthly")
+        ppet_diff = ppet - ppet.roll(band=1)
 
-        return {"temp": temp, "prec": prec, "pet": pet, "pet_diff": pet_diff}
+
+        return {"temp": temp, "prec": prec, "ppet": ppet, "ppet_diff": ppet_diff}
 
     def set_input(self, name, value, crop, system="short"):
         """
@@ -573,16 +681,23 @@ class CultivatedCrops(CellActivity):
         :type value: float
         :param crop: Crop name.
         :type crop: str
-        :param system: Irrigation system.
+        :param system: Irrigation system of either long ("rainfed",
+        "surface irrigated", "sprinkler irrigated", "drip irrigated") or short
+        ("rainfed", "irrigated") or "short" for all two / "long" for all four.
         :type system: str
         """
 
-        if system == "short":
-            system = Crop.irrigation_systems_short
-        elif system == "long":
-            system = Crop.irrigation_systems_long
+        if system in Crop.irrigation_systems_short or system == "short":
+            all_systems = Crop.irrigation_systems_short
+        elif system in Crop.irrigation_systems_long or system == "long":
+            all_systems = Crop.irrigation_systems_long
         else:
             raise ValueError("Invalid irrigation system")
+
+        if system in ["short", "long"]:
+            system = all_systems
+        else:
+            system = [system]
 
         self.cell.input[name].loc[
             dict(band=[f"{irrig} {crop}" for irrig in system])  # noqa
@@ -594,20 +709,38 @@ class CultivatedCrops(CellActivity):
         seasonality = self.calc_seasonality(monthly_climate)
 
         for crop in self.calendars:
-            sowing_doy, sowing_month, sowing_season = self[crop].calc_sowing_date(
-                monthly_climate, seasonality
-            )
+            # calculate sowing date
+            self[crop].calc_sowing_date(monthly_climate, seasonality)
             # write sowing date to cell input
-            self.set_input(name="sdate", value=sowing_doy, crop=crop, system="short")
-            harvest_rule, harvest_rule_name = self[crop].calc_harvest_rule(
-                monthly_climate, seasonality
+            self.set_input(
+                name="sdate",
+                value=self[crop].sdate,
+                crop=crop,
+                system="short"
             )
-            hd_vector = self[crop].calc_harvest_date_vector(
-                monthly_climate,
-                sowing_doy,
-                sowing_season
+            # calculate harvest rule
+            self[crop].calc_harvest_rule(monthly_climate, seasonality)
+
+            # calculate different options for harvesting
+            self[crop].calc_harvest_options(monthly_climate)
+
+            # calculate harvest date, choose the best option
+            self[crop].calc_harvest_date(monthly_climate, seasonality)
+
+            # write phu rainfed to cell input
+            self.set_input(
+                name="sdate",
+                value=self[crop].calc_phu(monthly_climate, self[crop].hdate_rf),
+                crop=crop,
+                system="rainfed"
             )
-            breakpoint()
+            # write phu irrigated to cell input
+            self.set_input(
+                name="sdate",
+                value=self[crop].calc_phu(monthly_climate, self[crop].hdate_ir),
+                crop=crop,
+                system="irrigated"
+            )
 
     def update(self):
         """
