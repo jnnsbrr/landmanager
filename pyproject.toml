@@ -3,7 +3,7 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pymodels"
+name = "landmanager"
 version = "0.1.1"
 description = "Models build around LPJmL based on the copan:LPJmL modeling framework"
 readme = "README.md"
@@ -49,8 +49,8 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/jannesbr/pymodels"
-Issues = "https://github.com/jannesbr/pymodels/issues"
+Homepage = "https://github.com/jannesbr/landmanager"
+Issues = "https://github.com/jannesbr/landmanager/issues"
 
 [tool.aliases]
 test = "pytest"
@@ -68,7 +68,7 @@ target-version = ['py37', 'py38', 'py39', 'py310']
 max-line-length = 88
 
 [project.scripts]
-pymodels-cli = "pymodels.cli:main"
+landmanager-cli = "landmanager.cli:main"
 
 [tool.setuptools.package-data]
-"pymodels.data" = ["**/*.csv"]  # Includes all CSVs inside pymodels/data
+"landmanager.data" = ["**/*.csv"]  # Includes all CSVs inside landmanager/data

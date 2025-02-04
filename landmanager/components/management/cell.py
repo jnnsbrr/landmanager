@@ -13,7 +13,7 @@ import numpy as np
 from enum import Enum
 
 import pycopanlpjml as lpjml
-from pymodels.components import base
+from landmanager.components import base
 
 
 class Cell(lpjml.Cell, base.Cell):

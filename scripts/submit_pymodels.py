@@ -10,7 +10,7 @@ from pycoupler.run import check_lpjml, submit_lpjml
 sim_path = "./simulations"
 model_path = "./LPJmL"
 inseeds_config_file = (
-    "./inseeds/inseeds/models/regenerative_tillage/config.yaml"  # noqa"
+    "./landmanager/models/crop_calendar/config.yaml"  # noqa"
 )
 
 
@@ -68,6 +68,6 @@ check_lpjml(config_coupled_fn)
 # run lpjml simulation for coupling in the background
 submit_lpjml(
     config_file=config_coupled_fn,
-    couple_to="./inseeds/models/farmer_management/main.py",
+    couple_to="./landmanager/models/crop_calendar/main.py",
     wtime="5:00:00",
 )

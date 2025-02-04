@@ -7,15 +7,15 @@ from pycoupler.utils import search_country
 
 import os
 
-os.chdir("/p/projects/open/Jannes/repos/pymodels")
+os.chdir("/p/projects/open/Jannes/repos/landmanager")
 
-from pymodels.models.crop_calendar import Model  # noqa
+from landmanager.models.crop_calendar import Model  # noqa
 
 # Settings ================================================================== #
 
 sim_path = "./test_sim"
 model_path = ".LPJmL"
-pymodels_config_file = "./pymodels/models/crop_calendar/config.yaml"  # noqa
+landmanager_config_file = "./landmanager/models/crop_calendar/config.yaml"  # noqa
 
 # search for country code by supplying country name
 # search_country("netherlands")
@@ -78,7 +78,7 @@ config_coupled.double_harvest = False
 # regrid by country - create new (extracted) input files and update config file
 config_coupled.regrid(sim_path, country_code=country_code)
 
-config_coupled.add_config(pymodels_config_file)
+config_coupled.add_config(landmanager_config_file)
 
 
 # write config (Config object) as json file
@@ -96,7 +96,7 @@ run_lpjml(
     std_to_file=False  # write stdout and stderr to file
 )
 
-# pymodels run --------------------------------------------------------------- #
+# landmanager run --------------------------------------------------------------- #
 
 model = Model(config_file=config_coupled_fn)
 

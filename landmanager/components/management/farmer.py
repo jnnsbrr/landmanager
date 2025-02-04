@@ -12,7 +12,7 @@
 import numpy as np
 
 import pycopancore.model_components.base as core
-from pymodels.components import base
+from landmanager.components import base
 
 
 class Farmer(core.Individual, base.Individual):

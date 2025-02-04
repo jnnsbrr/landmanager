@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 import inseeds.components.base as base
-import inseeds.components.farming as farming
+import inseeds.components.management as management
 from inseeds.models.regenerative_tillage import Cell, Farmer, World, Model
 
 

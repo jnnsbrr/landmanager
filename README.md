@@ -1,4 +1,4 @@
-# pymodels
+# landmanager
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14265856.svg)](https://doi.org/10.5281/zenodo.14265856) [![CI](https://github.com/pik-copan/inseeds/actions/workflows/check.yml/badge.svg)](https://github.com/pik-copan/inseeds/actions) [![codecov](https://codecov.io/gh/pik-copan/inseeds/graph/badge.svg?token=JU73NURPI0)](https://codecov.io/gh/pik-copan/inseeds)
 
@@ -11,7 +11,7 @@
 
 ### [Models](./inseeds/models)
 
-pymodels provides multiple model classes which can be used to simulate different
+landmanager provides multiple model classes which can be used to simulate different
 aspects of the social-ecological system, depending how the model is build and
 configured.  
 
@@ -30,7 +30,7 @@ up the world.
 
 ## Installation
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install pymodels.
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install landmanager.
 
 ```bash
 pip install .
@@ -42,13 +42,13 @@ on the PIK HPC (with Slurm Workload Manager).
 The PIK python libraries [pycoupler](https://github.com/PIK-LPJmL/pycoupler),
 [pycopancore](https://github.com/pik-copan/pycopancore),
 as well as [pycopanlpjml](https://github.com/pik-copan/pycopanlpjml)
-are required as they build framework that serves as the model base for pymodels.
+are required as they build framework that serves as the model base for landmanager.
 
 See [scripts](./scripts/) for examples on how to use the model.
 
 ## Questions / Problems
 
-In case of questions please contact the author team or [open an issue](https://github.com/pik-copan/pymodels/issues/new).
+In case of questions please contact the author team or [open an issue](https://github.com/pik-copan/landmanager/issues/new).
 
 ## Contributing
 Merge requests are welcome, see [CONTRIBUTING.md](CONTRIBUTING.md). For major changes, please open an issue first to discuss what you would like to change.

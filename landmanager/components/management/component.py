@@ -1,10 +1,10 @@
-"""Farming component for the model."""
+"""Management component for the model."""
 
-from pymodels.components import base
+from landmanager.components import base
 
 
 class Component(base.Component):
-    """Model mixing component class for farming."""
+    """Model mixing component class for management."""
 
     def init_farmers(self, farmer_class, **kwargs):
         """Initialize farmers in the world.

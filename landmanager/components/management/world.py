@@ -1,7 +1,7 @@
 """The inseeds_farmer_mnagement.world class.
 """
 
-from pymodels.components import base
+from landmanager.components import base
 import pycopanlpjml as lpjml
 
 

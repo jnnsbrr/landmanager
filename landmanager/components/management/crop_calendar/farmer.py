@@ -1,4 +1,4 @@
-"""Farmer entity type class of inseeds_farmer_management
+"""Farmer entity type class of landmanager_farmer_management
 """
 import re
 import numpy as np
@@ -7,11 +7,11 @@ import pycoupler
 from enum import Enum
 import datetime
 
-from pymodels.components import farming
-from pymodels.components import base
+from landmanager.components import management
+from landmanager.components import base
 
 
-class Farmer(farming.Farmer):
+class Farmer(management.Farmer):
     """Farmer (Individual) entity type mixin class."""
 
     def __init__(self, **kwargs):
@@ -548,7 +548,7 @@ class Crop(CellActivity):
         )
 
         # Warmest day of the year
-        warmest_day = daily_climate["temp"].argmin() + 1
+        warmest_day = daily_climate["temp"].argmin().item() + 1
         hdate_temp_base = (
             warmest_day
             if self.sseason == "winter"
@@ -771,7 +771,7 @@ class Crop(CellActivity):
         husum = 0
 
         # Select days not in growing period
-        hdate = hdate if self.sdate < hdate else hdate + 365
+        hdate = hdate if self.sdate < hdate else hdate + 365#
         if hdate <= 365:
             days_no_gp = list(range(1, self.sdate)) + list(range(hdate, 366))
         else:
@@ -958,7 +958,7 @@ class CultivatedCrops(CellActivity):
 
         self.cell.input[name].loc[
             dict(band=[f"{irrig} {crop}" for irrig in system])  # noqa
-        ] = [self.cell.model.lpjml.sim_year-2000]
+        ] = [value]
 
     def calc_calendar(self):
         """Calculate the crop calendar for each crop in calendars."""
@@ -1053,7 +1053,7 @@ class CultivatedCrops(CellActivity):
         Update the CultivatedCrops object.
         """
         self.update_landuse()
-        self.calc_calendar()
+        self.calc_calendar_daily()
 
 
 def calc_var_coeff(x):

@@ -16,9 +16,9 @@ def load_csv(file_path: str) -> pd.DataFrame:
 
     # Extract the package (subfolder) and file name
     if len(parts) == 1:
-        package, file_name = "pymodels.data", parts[0]
+        package, file_name = "landmanager.data", parts[0]
     else:
-        package = f"pymodels.data.{'.'.join(parts[:-1])}"
+        package = f"landmanager.data.{'.'.join(parts[:-1])}"
         file_name = parts[-1]
 
     # Open and load the CSV file

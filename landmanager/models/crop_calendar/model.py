@@ -1,8 +1,8 @@
 import pycopancore.model_components.base as core
 
-from pymodels.components import farming
-from pymodels.components.farming.management import crop_calendar
-from pymodels.components import lpjml
+from landmanager.components import management
+from landmanager.components.management import crop_calendar
+from landmanager.components import lpjml
 
 
 class Farmer(crop_calendar.Farmer):
@@ -11,19 +11,19 @@ class Farmer(crop_calendar.Farmer):
     pass
 
 
-class Cell(farming.Cell):
+class Cell(management.Cell):
     """Cell entity type."""
 
     pass
 
 
-class World(farming.World):
+class World(management.World):
     """World entity type."""
 
     pass
 
 
-class Model(lpjml.Component, farming.Component):
+class Model(lpjml.Component, management.Component):
     """Model class for the InSEEDS Social model integrating the LPJmL model and
     coupling component as well as the farmer management component.
     """

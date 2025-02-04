@@ -1,23 +1,23 @@
-# Contributing to pymodels
+# Contributing to landmanager
 
-Thank you for your interest in contributing to *pymodels*, an open-source copan:CORE based social-ecological model written in Python.
+Thank you for your interest in contributing to *landmanager*, an open-source copan:CORE based social-ecological model written in Python.
 We currently prefer contributions in the form of bug reports, feature requests,
 and suggestions of code improvements as issues in the
-[pymodels GitHub repository](https://github.com/jannesbr/pymodels/issues).
+[landmanager GitHub repository](https://github.com/jannesbr/landmanager/issues).
 If you want to contribute code, please follow the instructions below.
 
 
 ## Getting Started
 
-Before you start contributing to *pymodels*, here are a few steps to get you
+Before you start contributing to *landmanager*, here are a few steps to get you
 set up:
 
-1. Fork the [pymodels GitHub repository](https://github.com/jannesbr/pymodels)
+1. Fork the [landmanager GitHub repository](https://github.com/jannesbr/landmanager)
 to your own GitHub account.
 2. Clone your forked repository to your local machine.
    ```shell
-   git clone https://github.com/YourUsername/pymodels.git
-   cd pymodels
+   git clone https://github.com/YourUsername/landmanager.git
+   cd landmanager
    ```
 3. Install the library and its dependencies following the instructions in the
 documentation.
@@ -26,10 +26,10 @@ Now you're ready to start making contributions!
 
 ## Contributing
 
-To contribute to *pymodels*, please follow these steps:
+To contribute to *landmanager*, please follow these steps:
 
 1. Check for existing issues in the
-[**issue tracker**](https://github.com/jannesbr/pymodels/issues) to see if
+[**issue tracker**](https://github.com/jannesbr/landmanager/issues) to see if
 your contribution idea has already been discussed or reported.
 2. If the issue doesn't already exist, create a **new issue** to discuss the
 problem or feature you want to address. Be sure to provide as much detail as
@@ -43,7 +43,7 @@ adhering to the **coding style** of the project.
 Describe your changes, and our team will review it as soon as possible.
 7. All discussion threads of the PR need to be resolved before the PR can be merged.
 
-Your contributions will be greatly appreciated and will help make *pymodels*
+Your contributions will be greatly appreciated and will help make *landmanager*
 even better.
 
 ## Code Quality
@@ -55,7 +55,7 @@ submitting a pull request.
 
 ## Code of Conduct
 
-Please note that by contributing to *pymodels*, you are expected to adhere to
+Please note that by contributing to *landmanager*, you are expected to adhere to
 our Code of Conduct. We strive to maintain a welcoming and inclusive community,
 and we expect respectful and considerate behavior from all contributors:
 * **Be Respectful**: Treat all community members with respect and kindness.
