@@ -263,111 +263,6 @@ class Crop(CellActivity):
         )
         self.sseason = sseason
 
-    def calc_sowing_date_daily(self, daily_climate, monthly_climate, seasonality):
-        """
-        Calculate sowing date (Waha et al., 2012)
-
-        :param daily_climate: Dict of arrays of daily temperatures.
-        :type daily_climate: dict
-        :param monthly_climate: Dict of arrays of monthly temperatures.
-        :type monthly_climate: dict
-        :param seasonality: Seasonality classification.
-        :type seasonality: str
-
-        """
-        lat = self.cell.grid.lat.item()
-
-        # Constrain first possible date for winter crop sowing
-        earliest_sdate = self.initdate_sdatenh if lat >= 0 else self.initdate_sdatesh
-        earliest_smonth = doy2month(earliest_sdate)
-        default_doy = 1 if lat >= 0 else 182
-        default_month = 0
-
-
-        # What type of winter is it?
-        if (min(monthly_climate["temp"]) > self.basetemp_low) and (
-            seasonality in ["TEMP", "TEMPPREC", "PRECTEMP", "PREC"]
-        ):
-            # "Warm winter" (allowing non-vernalizing winter-sown crops)
-            # sowing 2.5 months before coldest midday
-            # it seems a good approximation for both India and South US)
-            coldestday = daily_climate["temp"].argmin().item() + 1
-            firstwinterdoy = (
-                coldestday - 75 if coldestday - 75 > 0 else coldestday - 75 + 365
-            )
-
-        elif (min(monthly_climate["temp"]) < -10) and (
-            seasonality in ["TEMP", "TEMPPREC", "PRECTEMP", "PREC"]
-        ):
-            # "Cold winter" (winter too harsh for winter crops, only spring sowing possible)
-            firstwinterdoy = -9999
-
-        else:
-            # "Mild winter" (allowing vernalizing crops)
-            firstwinterdoy = calc_doy_cross_threshold_daily(
-                daily_climate["temp"], self.temp_fall
-            )["doy_cross_down"]
-
-        # First day of winter
-        firstwintermonth = (
-            default_month if firstwinterdoy == -9999 else doy2month(firstwinterdoy)
-        )
-        firstwinterdoy = default_doy if firstwinterdoy == -9999 else firstwinterdoy
-
-        # First day of spring
-        firstspringdoy = calc_doy_cross_threshold_daily(
-            daily_climate["temp"], self.temp_spring
-        )["doy_cross_up"]
-        firstspringmonth = (
-            default_month if firstspringdoy == -9999 else doy2month(firstspringdoy)
-        )
-
-        # If winter type
-        if self.calcmethod_sdate == "WTYP_CALC_SDATE":
-
-            if firstwinterdoy > earliest_sdate and firstwintermonth != default_month:
-                smonth = firstwintermonth
-                sdate = firstwinterdoy
-                sseason = "winter"
-
-            elif (
-                firstwinterdoy <= earliest_sdate
-                and min(monthly_climate["temp"]) > temp_fall
-                and firstwintermonth != default_month
-            ):
-                smonth = earliest_smonth
-                sdate = earliest_sdate
-                sseason = "winter"
-
-            else:
-                smonth = firstspringmonth
-                sdate = firstspringdoy
-                sseason = "spring"
-
-        else:
-            if seasonality == "NO_SEASONALITY":
-                smonth = default_month
-                sdate = default_doy
-                sseason = "spring"
-
-            elif seasonality in ["PREC", "PRECTEMP"]:
-                sdate = calc_doy_wet_day(daily_climate["ppet"])
-                smonth = doy2month(sdate)
-                sseason = "spring"
-
-            else:
-                smonth = firstspringmonth
-                sdate = firstspringdoy
-                sseason = "spring"
-
-        self.sdate = default_doy if smonth == default_month else sdate
-        self.smonth = (
-            default_month
-            if self.calcmethod_sdate == "WTYP_CALC_SDATE" and sseason == "spring"
-            else smonth
-        )
-        self.sseason = sseason
-
     def calc_harvest_rule(self, monthly_climate, seasonality):
         """
         Calculate harvest rule (Minoli et al., 2019).
@@ -507,90 +402,6 @@ class Crop(CellActivity):
             hdate_temp_opt + self.ndays_year if hdate_temp_opt < self.sdate else hdate_temp_opt
         )
 
-
-    def calc_harvest_options_daily(self, daily_climate, monthly_climate):
-        """
-        Calculate harvest date vector.
-
-        :param daily_climate: Dict of arrays of daily temperatures.
-        :type daily_climate: dict
-        :param monthly_climate: Dict of arrays of monthly temperatures.
-        :type monthly_climate: dict
-        """
-
-        # Shortest cycle: crop lower biological limit
-        hdate_first = self.sdate + self.min_growingseason
-        # Medium cycle: best trade-off vegetative and reproductive growth
-        hdate_maxrp = self.sdate + self.maxrp_growingseason
-        # Longest cycle: crop upper biological limit
-        hdate_last = self.sdate + (
-            self.max_growingseason_wt
-            if self.sseason == "winter"
-            else self.max_growingseason_st
-        )
-
-        # End of wet season
-        doy_wet1 = calc_doy_cross_threshold_daily(daily_climate["ppet"], self.ppet_ratio)[
-            "doy_cross_down"
-        ]
-        doy_wet2 = calc_doy_cross_threshold_daily(
-            daily_climate["ppet_diff"], self.ppet_ratio_diff
-        )["doy_cross_down"]
-        doy_wet_vec = [
-            doy + self.ndays_year if doy < self.sdate and doy != -9999 else doy
-            for doy in [doy_wet1, doy_wet2]
-        ]
-        doy_wet_first = min([doy for doy in doy_wet_vec if doy != -9999], default=-9999)
-        hdate_wetseas = (
-            hdate_last
-            if doy_wet1 == -9999 and min(monthly_climate["ppet"]) < self.ppet_min
-            else doy_wet_first + self.rphase_duration
-        )
-
-        # Warmest day of the year
-        warmest_day = daily_climate["temp"].argmin().item() + 1
-        hdate_temp_base = (
-            warmest_day
-            if self.sseason == "winter"
-            else warmest_day + self.rphase_duration
-        )
-
-        # First hot day
-        doy_exceed_opt_rp = calc_doy_cross_threshold_daily(
-            daily_climate["temp"],
-            self.temp_opt_rphase
-        )["doy_cross_up"]
-        doy_exceed_opt_rp = doy_exceed_opt_rp + self.ndays_year if doy_exceed_opt_rp < self.sdate and doy_exceed_opt_rp != -9999 else doy_exceed_opt_rp
-
-        # Last hot day
-        doy_below_opt_rp = calc_doy_cross_threshold_daily(daily_climate["temp"], self.temp_opt_rphase)[
-            "doy_cross_down"
-        ]
-        doy_below_opt_rp = doy_below_opt_rp + self.ndays_year if doy_below_opt_rp < self.sdate and doy_below_opt_rp != -9999 else doy_below_opt_rp
-
-        # Winter type: First hot day; Spring type: Last hot day
-        doy_opt_rp = (
-            doy_exceed_opt_rp if self.sseason == "winter" else doy_below_opt_rp
-        )
-        hdate_temp_opt = (
-            hdate_maxrp
-            if doy_opt_rp == -9999
-            else doy_opt_rp + (self.rphase_duration if self.sseason != "winter" else 0)
-        )
-
-        self.hdate_first = hdate_first
-        self.hdate_maxrp = hdate_maxrp
-        self.hdate_last = hdate_last
-        # If harvest date < sowing date, it occurs the following year, so add 365 days
-        self.hdate_wetseas = hdate_wetseas + self.ndays_year if hdate_wetseas < self.sdate else hdate_wetseas
-        self.hdate_temp_base = (
-            hdate_temp_base + self.ndays_year if hdate_temp_base < self.sdate else hdate_temp_base
-        )
-        self.hdate_temp_opt = (
-            hdate_temp_opt + self.ndays_year if hdate_temp_opt < self.sdate else hdate_temp_opt
-        )
-
-
     def calc_harvest_date(
         self,
         monthly_climate,
@@ -609,7 +420,6 @@ class Crop(CellActivity):
 
         :param monthly_climate: Dict of arrays of monthly temperatures.
         :type monthly_climate: dict
-
         """
 
         if seasonality == "NO_SEASONALITY":
@@ -750,58 +560,6 @@ class Crop(CellActivity):
         return husum
 
 
-    def calc_phu_daily(self, daily_climate, monthly_climate, hdate, vern_factor=None, phen_model="t"):
-        """
-        Calculate PHU requirements.
-
-        :param daily_climate: Dict of arrays of daily temperatures.
-        :type daily_climate: dict
-        :param monthly_climate: Dict of arrays of monthly temperatures.
-        :type monthly_climate: dict
-        :param hdate: Maturity date (DOY).
-        :type hdate: int
-        :param vern_factor: Vernalization factor from calcVf(), length should be 365.
-        :type vern_factor: list or numpy.ndarray
-        :param phen_model: Phenological model, one of "t", "tv", "tp", "tvp".
-        :type phen_model: str
-        :return: Total Thermal Unit Requirements.
-        :rtype: int
-        """
-
-        husum = 0
-
-        # Select days not in growing period
-        hdate = hdate if self.sdate < hdate else hdate + 365#
-        if hdate <= 365:
-            days_no_gp = list(range(1, self.sdate)) + list(range(hdate, 366))
-        else:
-            days_no_gp = list(range(hdate - 365, self.sdate))
-
-        # Compute Effective Thermal Units (teff)
-        if phen_model == "t":
-            teff = [
-                max(temp - self.basetemp_low, 0) if i not in days_no_gp else 0
-                for i, temp in enumerate(daily_climate["temp"], start=1)
-            ]
-        elif phen_model == "tv":
-            teff = [
-                max(temp - self.basetemp_low, 0) * vf if i not in days_no_gp else 0
-                for i, (temp, vf) in enumerate(zip(daily_climate["temp"], vern_factor), start=1)
-            ]
-        else:
-            raise ValueError("Error: phen_model not declared!")
-
-        # Total Thermal Unit Requirements
-        if phen_model == "t":
-            husum = int(sum(teff))
-        elif phen_model == "tv":
-            husum = int(sum(teff)) * -1
-        else:
-            raise ValueError("Error: phen_model not declared!")
-
-        return husum
-
-
 class CultivatedCrops(CellActivity):
 
     def __init__(self, crop_param_file="crop_calendar/crop_parameters.csv", **kwargs):
@@ -906,27 +664,6 @@ class CultivatedCrops(CellActivity):
 
         return {"temp": temp, "prec": prec, "ppet": ppet, "ppet_diff": ppet_diff}
 
-    @property
-    def daily_climate(self):
-        """
-        Return monthly climate data for the cell.
-        """
-
-        # average temperature of the cell
-        temp = self.var("temp", avg="daily")
-
-        # average temperature of the cell
-        prec = self.var("prec", avg="daily")
-
-        # average temperature of the cell
-        ppet = (prec / self.var("pet", avg="daily")).fillna(0)
-
-        # average potential evaporation of the cell
-        ppet_diff = ppet - ppet.roll(band=1)
-
-
-        return {"temp": temp, "prec": prec, "ppet": ppet, "ppet_diff": ppet_diff}
-
 
     def set_input(self, name, value, crop, system="short"):
         """
@@ -999,61 +736,12 @@ class CultivatedCrops(CellActivity):
                 system="irrigated"
             )
 
-    def calc_calendar_daily(self):
-        """Calculate the crop calendar for each crop in calendars."""
-        daily_climate = self.daily_climate
-        monthly_climate = daily_to_monthly(daily_climate)
-
-        seasonality = self.calc_seasonality(monthly_climate)
-
-        for crop in self.calendars:
-            # calculate sowing date
-            self[crop].calc_sowing_date_daily(daily_climate, monthly_climate, seasonality)
-            # write sowing date to cell input
-            self.set_input(
-                name="sdate",
-                value=self[crop].sdate,
-                crop=crop,
-                system="short"
-            )
-            # calculate harvest rule
-            self[crop].calc_harvest_rule(monthly_climate, seasonality)
-
-            # calculate different options for harvesting
-            self[crop].calc_harvest_options_daily(daily_climate, monthly_climate)
-
-            # calculate harvest date, choose the best option
-            self[crop].calc_harvest_date(monthly_climate, seasonality)
-
-            # write phu rainfed to cell input
-            self.set_input(
-                name="sdate",
-                value=self[crop].calc_phu_daily(
-                    daily_climate,
-                    monthly_climate,
-                    self[crop].hdate_rf
-                ),
-                crop=crop,
-                system="rainfed"
-            )
-            # write phu irrigated to cell input
-            self.set_input(
-                name="sdate",
-                value=self[crop].calc_phu_daily(
-                    daily_climate,
-                    monthly_climate,
-                    self[crop].hdate_ir
-                ),
-                crop=crop,
-                system="irrigated"
-            )
-
     def update(self):
         """
         Update the CultivatedCrops object.
         """
         self.update_landuse()
-        self.calc_calendar_daily()
+        self.calc_calendar()
 
 
 def calc_var_coeff(x):
@@ -1164,68 +852,11 @@ def calc_doy_cross_threshold(monthly_value, threshold):
     return {"doy_cross_up": day_cross_up, "doy_cross_down": day_cross_down}
 
 
-def calc_doy_cross_threshold_daily(daily_value, threshold, min_consecutive_days=60):
-    """
-    Calculate the day of year (DOY) when the value crosses the threshold with a minimum number of consecutive days 
-    above or below the threshold to avoid fluctuations.
-
-    :param daily_value: Array of daily values.
-    :param threshold: Threshold value.
-    :param min_consecutive_days: Minimum number of consecutive days the value must stay above or below the threshold to count as a crossing.
-    :return: Dictionary with the first upward and downward crossing days.
-    """
-    # Create an array indicating whether the value is above the threshold
-    is_above = daily_value >= threshold
-    crosses = np.diff(is_above.astype(int))
-
-    # Find upward and downward crossings
-    upward_crossings = np.where(crosses == 1)[0] + 1
-    downward_crossings = np.where(crosses == -1)[0] + 1
-
-    # Filter crossings based on minimum consecutive days
-    valid_upward_crossings = [upward_crossings[0]] if len(upward_crossings) > 0 else []
-    for i in range(1, len(upward_crossings)):
-        if upward_crossings[i] - upward_crossings[i-1] >= min_consecutive_days:
-            valid_upward_crossings.append(upward_crossings[i])
-
-    valid_downward_crossings = [downward_crossings[0]] if len(downward_crossings) > 0 else []
-    for i in range(1, len(downward_crossings)):
-        if downward_crossings[i] - downward_crossings[i-1] >= min_consecutive_days:
-            valid_downward_crossings.append(downward_crossings[i])
-
-    # Return the first crossing day for each, or -9999 if no valid crossings are found
-    return {
-        "doy_cross_up": valid_upward_crossings[0].item() if valid_upward_crossings else -9999,
-        "doy_cross_down": valid_downward_crossings[0].item() if valid_downward_crossings else -9999,
-    }
-
-
 def get_midday():
     """
     Standardized midday of each month.
     """
     return np.array([15, 43, 74, 104, 135, 165, 196, 227, 257, 288, 318, 349])
-
-
-def daily_to_monthly(data, func="mean"):
-    """
-    Recursively aggregate daily values into monthly values using a specified function.
-
-    :param data: LPJmLData, LPJmLDataSet, or dict containing them.
-    :param func: Aggregation function as a string (e.g., "mean", "sum", etc.).
-    :return: Processed data with "band" reduced to 12 monthly values.
-    """
-    if isinstance(data, dict):
-        return {k: daily_to_monthly(v, func) for k, v in data.items()}
-
-    month_edges = np.insert(np.cumsum([31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]), 0, 0)
-
-    if not hasattr(data, func):
-        raise ValueError(f"Invalid function '{func}'. Use a valid xarray method.")
-
-    return getattr(
-        data.groupby_bins("band", bins=month_edges, labels=np.arange(1, 13)), func
-    )().rename(band_bins="band")
 
 
 def calc_doy_wet_month(monthly_ppet):
@@ -1245,25 +876,5 @@ def calc_doy_wet_month(monthly_ppet):
     daily_value = interpolate_monthly_to_daily(monthly_ppet)["y"]
     
     x = np.array([np.sum(daily_value[i:i+120]) for i in range(365-120+1)])
-    
-    return doys[np.argmax(x)]
-
-
-def calc_doy_wet_day(daily_ppet):
-    """
-    Calculate the first day of the 120 wettest days period.
-
-    This function finds the first day of the 120-day period with the maximum 
-    cumulative sum of the precipitation to potential evapotranspiration (P/PET) ratio.
-
-    :param monthly_ppet: List or numpy array of monthly P/PET values.
-    :type monthly_ppet: list or numpy array
-
-    :return: The day of the year (DOY) corresponding to the start of the wettest 120-day period.
-    :rtype: int
-    """    
-    doys = np.arange(1, 366)
-
-    x = np.array([np.sum(daily_ppet[i:i+120]) for i in range(365-120+1)])
     
     return doys[np.argmax(x)]
