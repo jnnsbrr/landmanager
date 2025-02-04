@@ -25,9 +25,9 @@ class World(lpjml.World, base.World):
     @property
     def farmers(self):
         """Return the set of all farmers."""
-        farmers = {
+        farmers = [
             farmer
             for farmer in self.individuals
             if farmer.__class__.__name__ == "Farmer"  # noqa
-        }
+        ]
         return farmers

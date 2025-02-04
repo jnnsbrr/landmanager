@@ -30,8 +30,8 @@ class Component(base.Component):
         farmers_sorted = sorted(farmers, key=lambda farmer: farmer.avg_hdate)
 
         # init neighbourhood for each farmer
-        for farmer in farmers_sorted:
-            farmer.init_neighbourhood()
+        # for farmer in farmers_sorted:
+        #     farmer.init_neighbourhood()
 
     def update_farmers(self):
         """Update initialization/deactivation of farmers in the world if land
@@ -54,14 +54,16 @@ class Component(base.Component):
                 farmers.append(farmer)
                 change = True
             elif cell.is_old_landuse:
-                farmers.remove(cell.farmer)
-                cell.farmer.deactivate()
+                farmers.remove(cell.farmers[0])
+                cell.farmers[0].deactivate()
+            else:
+                farmers.append(cell.farmers[0])
 
         farmers_sorted = sorted(farmers, key=lambda farmer: farmer.avg_hdate)
-        if change:
-            # TODO: rework neighbourhood update to only update affected farmers
-            for farmer in farmers_sorted:
-                farmer.init_neighbourhood()
+        # if change:
+        #     # TODO: rework neighbourhood update to only update affected farmers
+        #     for farmer in farmers_sorted:
+        #         farmer.init_neighbourhood()
 
         return farmers_sorted
 

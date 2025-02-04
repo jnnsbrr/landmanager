@@ -13,9 +13,9 @@ from pymodels.models.crop_calendar import Model  # noqa
 
 # Settings ================================================================== #
 
-sim_path = "/p/projects/copan/users/jannesbr/projects/crop_calendar/test_sim"
-model_path = "/p/projects/open/Jannes/copan_core/lpjml/LPJmL"
-pymodels_config_file = "/p/projects/open/Jannes/repos/pymodels/pymodels/models/crop_calendar/config.yaml"  # noqa
+sim_path = "./test_sim"
+model_path = ".LPJmL"
+pymodels_config_file = "./pymodels/models/crop_calendar/config.yaml"  # noqa
 
 # search for country code by supplying country name
 # search_country("netherlands")
@@ -39,7 +39,7 @@ config_coupled.set_coupled(
     coupled_input=[
         "sdate",
         "crop_phu",
-        "landuse"
+        "landuse",
     ],  # residue_on_field
     coupled_output=[
         "temp",
@@ -76,7 +76,7 @@ config_coupled.residue_treatment = "read_residue_data"
 config_coupled.double_harvest = False
 
 # regrid by country - create new (extracted) input files and update config file
-config_coupled.regrid(sim_path, country_code=country_code, overwrite_input=False)
+config_coupled.regrid(sim_path, country_code=country_code)
 
 config_coupled.add_config(pymodels_config_file)
 
@@ -88,7 +88,7 @@ config_coupled_fn = config_coupled.to_json()
 # Simulations =============================================================== #
 
 # check if everything is set correct
-# check_lpjml(config_coupled_fn)
+check_lpjml(config_coupled_fn)
 
 # run lpjml simulation for coupling in the background
 run_lpjml(

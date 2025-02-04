@@ -51,12 +51,14 @@ class Model(lpjml.Component, farming.Component):
             area=self.lpjml.terr_area,
         )
         # initialize cells
-        self.init_cells(cell_class=Cell)
+        self.init_cells(model=self, cell_class=Cell)
 
         # initialize farmers
         self.init_farmers(farmer_class=Farmer)
 
     def update(self, t):
         super().update(t)
-
+        # self.write_output_table(
+        #     file_format=self.config.coupled_config.output_settings.file_format
+        # )
         self.update_lpjml(t)

@@ -67,7 +67,7 @@ class Farmer(core.Individual, base.Individual):
     @property
     def farmers(self):
         """Return the set of all farmers in the neighbourhood."""
-        return self.individuals
+        return [farmer for farmer in cell.individuals if isinstance(farmer, self.__class__)]
 
     @property
     def cell_cropyield(self):

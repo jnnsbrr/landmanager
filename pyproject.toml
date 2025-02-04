@@ -70,8 +70,5 @@ max-line-length = 88
 [project.scripts]
 pymodels-cli = "pymodels.cli:main"
 
-[tool.setuptools.packages.find]
-where = ["pymodels"]
-
-[tool.setuptools]
-include-package-data = true
+[tool.setuptools.package-data]
+"pymodels.data" = ["**/*.csv"]  # Includes all CSVs inside pymodels/data

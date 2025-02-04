@@ -28,6 +28,16 @@ class Cell(lpjml.Cell, base.Cell):
         self.is_landuse_previous = self.is_landuse
 
     @property
+    def farmers(self):
+        """Return the set of all farmers."""
+        farmers = [
+            farmer
+            for farmer in self.individuals
+            if farmer.__class__.__name__ == "Farmer"  # noqa
+        ]
+        return farmers
+
+    @property
     def landuse(self):
         """Get land use of the cell."""
         return self.input.landuse.isel(time=-1).sum()
