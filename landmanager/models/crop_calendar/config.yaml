@@ -3,6 +3,18 @@
 lpjml_settings:
     country_code_to_name: true
     iso_country_code: true
+# Variables to be written to copan_core_data table file 
+output:
+    world:
+        - "hdate_ir"
+        - "hdate_rf"
+        - "hreason_rf"
+        - "hreason_ir"
+
+# Define how copan_core_data table file should be written
+output_settings:
+    write_lon_lat: true
+    file_format: "csv" # "parquet" "csv"
 
 # Define which farmer variables map with coupled LPJmL input variables
 coupling_map:

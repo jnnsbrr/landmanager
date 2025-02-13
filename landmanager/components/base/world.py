@@ -17,11 +17,11 @@ class World(Entity):
     def output_table(self):
         variables = self.get_defined_outputs()
 
+        breakpoint()
         if not variables:
             return pd.DataFrame()
         else:
             df = super().output_table
-
             if hasattr(self, "area"):
                 df.insert(
                     5,
