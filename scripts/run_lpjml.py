@@ -1,4 +1,4 @@
-"""Run script for InSEEDS with LPJmL coupling"""
+"""Run script for landmanager with LPJmL coupling"""
 
 import os
 import numpy as np  # which is usually needed

@@ -3,9 +3,9 @@ import pytest
 import numpy as np
 import pandas as pd
 
-import inseeds.components.base as base
-import inseeds.components.management as management
-from inseeds.models.regenerative_tillage import Cell, Farmer, World, Model
+import landmanager.components.base as base
+import landmanager.components.management as management
+from landmanager.models.crop_calendar import Cell, Farmer, World, Model
 
 
 def test_run_model(test_path):

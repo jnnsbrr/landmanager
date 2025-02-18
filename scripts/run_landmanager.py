@@ -1,4 +1,4 @@
-"""Run script for InSEEDS with LPJmL coupling"""
+"""Run script for landmanager with LPJmL coupling"""
 
 from pycoupler.config import read_config
 from pycoupler.run import run_lpjml, check_lpjml

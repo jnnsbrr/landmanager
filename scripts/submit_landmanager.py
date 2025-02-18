@@ -1,4 +1,4 @@
-"""Submit script for InSEEDS with LPJmL coupling"""
+"""Submit script for landmanager with LPJmL coupling"""
 
 from pycoupler.config import read_config
 from pycoupler.run import check_lpjml, submit_lpjml
@@ -9,7 +9,7 @@ from pycoupler.run import check_lpjml, submit_lpjml
 # paths
 sim_path = "./simulations"
 model_path = "./LPJmL"
-inseeds_config_file = (
+landmanager_config_file = (
     "./landmanager/models/crop_calendar/config.yaml"  # noqa"
 )
 
@@ -54,7 +54,7 @@ config_coupled.residue_treatment = "read_residue_data"
 
 config_coupled.double_harvest = False
 
-config_coupled.add_config(inseeds_config_file)
+config_coupled.add_config(landmanager_config_file)
 
 # write config (Config object) as json file
 config_coupled_fn = config_coupled.to_json()

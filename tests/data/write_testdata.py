@@ -1,4 +1,4 @@
-"""Run script for InSEEDS with LPJmL coupling"""
+"""Run script for landmanager with LPJmL coupling"""
 
 import pickle
 
@@ -7,14 +7,14 @@ from pycoupler.run import run_lpjml, check_lpjml
 from pycoupler.coupler import LPJmLCoupler
 from pycoupler.utils import search_country
 
-from inseeds.models.regenerative_tillage import Model  # noqa
+from landmanager.models.regenerative_tillage import Model  # noqa
 
 # Settings ================================================================== #
 
 # paths
 sim_path = "./simulations"
 model_path = "./LPJmL"
-inseeds_config_file = "./inseeds/models/regenerative_tillage/config.yaml"  # noqa"
+landmanager_config_file = "./landmanager/models/crop_calendar/config.yaml"  # noqa"
 
 # search for country code by supplying country name
 # search_country("netherlands")
@@ -63,9 +63,9 @@ config_coupled.double_harvest = False
 # regrid by country - create new (extracted) input files and update config file
 config_coupled.regrid(sim_path, country_code=country_code, overwrite_input=False)
 
-config_coupled.add_config(inseeds_config_file)
+config_coupled.add_config(landmanager_config_file)
 
-# set InSEEDS configuration: here we set the pioneer share to 0.25
+# set landmanager configuration: here we set the pioneer share to 0.25
 config_coupled.coupled_config.pioneer_share = 0.25
 
 # write config (Config object) as json file
@@ -82,19 +82,19 @@ run_lpjml(
     config_file=config_coupled_fn, std_to_file=False  # write stdout and stderr to file
 )
 
-# InSEEDS run --------------------------------------------------------------- #
+# landmanager run --------------------------------------------------------------- #
 
 model = Model(config_file=config_coupled_fn)
 
 # write config as json
-model.lpjml.config.to_json("./inseeds/tests/data/config.json")
+model.lpjml.config.to_json("./landmanager/tests/data/config.json")
 
 # write input and output data to pickle files
-with open("./inseeds/tests/data/lpjml_input.pkl", "wb") as outp:
+with open("./landmanager/tests/data/lpjml_input.pkl", "wb") as outp:
     pickle.dump(model.world.input, outp, pickle.HIGHEST_PROTOCOL)
 
-with open("./inseeds/tests/data/output.pkl", "wb") as outp:
+with open("./landmanager/tests/data/output.pkl", "wb") as outp:
     pickle.dump(model.world.output, outp, pickle.HIGHEST_PROTOCOL)
 
-with open("./inseeds/tests/data/lpjml.pkl", "wb") as lpj:
+with open("./landmanager/tests/data/lpjml.pkl", "wb") as lpj:
     pickle.dump(model.lpjml, lpj, pickle.HIGHEST_PROTOCOL)

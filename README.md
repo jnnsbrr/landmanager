@@ -1,6 +1,6 @@
 # landmanager
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14265856.svg)](https://doi.org/10.5281/zenodo.14265856) [![CI](https://github.com/pik-copan/inseeds/actions/workflows/check.yml/badge.svg)](https://github.com/pik-copan/inseeds/actions) [![codecov](https://codecov.io/gh/pik-copan/inseeds/graph/badge.svg?token=JU73NURPI0)](https://codecov.io/gh/pik-copan/inseeds)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14265856.svg)](https://doi.org/10.5281/zenodo.14265856) [![CI](https://github.com/pik-copan/landmanager/actions/workflows/check.yml/badge.svg)](https://github.com/pik-copan/landmanager/actions) [![codecov](https://codecov.io/gh/pik-copan/landmanager/graph/badge.svg?token=JU73NURPI0)](https://codecov.io/gh/pik-copan/landmanager)
 
 
 *Models build around LPJmL based on the [copan:LPJmL](https://github.com/pik-copan/pycopanlpjml) modeling framework*
@@ -9,14 +9,14 @@
 
 ...
 
-### [Models](./inseeds/models)
+### [Models](./landmanager/models)
 
 landmanager provides multiple model classes which can be used to simulate different
 aspects of the social-ecological system, depending how the model is build and
 configured.  
 
 
-### [Components](./inseeds/components)
+### [Components](./landmanager/components)
 
 Each model is build on a set of components that represent the different
 aspects of the social-ecological system. LPJmL is one component that is
