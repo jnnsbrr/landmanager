@@ -8,6 +8,7 @@ import pycoupler
 from enum import Enum
 import datetime
 from scipy.interpolate import CubicSpline
+from pycoupler.data import LPJmLDataSet
 
 from landmanager.components import management
 from landmanager.components import base
@@ -22,13 +23,47 @@ class World(management.World):
         """
         super().__init__(**kwargs)  # must be the first line
 
-        self.crop_calendar = WorldCrops(world=self)
+        # Initiate attributes
+        self.calendar = None
+
+        # Initiate the crop set with each crop and calendar
+        self.crops = WorldCropSet(world=self)
+        # Write the crop calendar to the input data
+        self.update_input()
 
     def update(self, t):
         # call the base class update method
         super().update(t)
         # update the crops
-        self.crop_calendar.update()
+        self.crops.update()
+        self.update_input()
+
+    def update_input(self):
+        """
+        Set the calendar data in LPJmL input for crop activities based on time
+        and crop growth stages.
+        """
+
+        self._set_input("sdate", self.calendar.sdate, mask_value=-9999)
+        self._set_input("crop_phu", self.calendar.crop_phu, mask_value=-9999)
+
+
+    def _set_input(self, name, value, mask_value=np.nan):
+        """
+        Set the cell input data for the crop.
+
+        :param name: Input data name.
+        :type name: str
+        :param value: Input data value.
+        :type value: float
+        :param mask_value: Mask value for the input data.
+        :type mask_value: float
+        """
+        # Vectorized check against the 'band' column
+        mask = xr.where(value == -9999, True, False)
+
+        # Expand mask to match the shape of `values` (assuming dim order: [bands, cells])
+        self.input[name].values = self.input[name].where(mask, value).values
 
 
 class WorldActivity:
@@ -75,7 +110,7 @@ class WorldActivity:
     def world(self):
         return self._world
 
-    def var(self, output, avg=None):
+    def get_output(self, output, avg=None):
         """Return the given attribute."""
         if avg in ["monthly", "daily"]:
             return self.world.output[output].mean("time")
@@ -93,9 +128,6 @@ class WorldCrop(WorldActivity):
 
         super().__init__(**kwargs)
         self.name = name
-        self.name_rf = f"rainfed {self.name}"
-        self.name_ir = f"irrigated {self.name}"
-        self.names = [self.name_rf, self.name_ir]
 
         # Extract relevant parameters based on crop name and winter crop classification
         param_filter = (parameters[column_name] == name) & (parameters["winter_crop"] == 0)
@@ -104,7 +136,11 @@ class WorldCrop(WorldActivity):
         ncell = len(self.world.grid.cell)
 
         for param, val in parameters[param_filter].items():
-            self[param] = xr.DataArray(np.repeat(val, ncell), dims=["cell"], coords={"cell": self.world.grid.cell.values}, name=param)
+            self[param] = xr.DataArray(
+                np.repeat(val, ncell), dims=["cell"],
+                coords={"cell": self.world.grid.cell.values},
+                name=param
+            )
             if not winter_param.empty:
                 self[param] = self[param].where(
                     self.is_winter_crop == False,
@@ -130,8 +166,8 @@ class WorldCrop(WorldActivity):
 
         self.hdate_rf = xr.full_like(base_array, -9999, dtype=float)
         self.hdate_ir = xr.full_like(base_array, -9999, dtype=float)
-        self.hreason_rf = xr.full_like(base_array, '', dtype=str)
-        self.hreason_ir = xr.full_like(base_array, '', dtype=str)
+        self.hreason_rf = xr.full_like(base_array, '', dtype="<U20")
+        self.hreason_ir = xr.full_like(base_array, '', dtype="<U20")
 
     @property
     def is_winter_crop(self, temperate_cereals_only=True):
@@ -436,7 +472,7 @@ class WorldCrop(WorldActivity):
         # Precompute max temperature once
         max_temp = monthly_climate["max_temp"]
         hdate = np.zeros_like(max_temp, dtype=int)
-        hreason = np.empty_like(max_temp, dtype="<U10")
+        hreason = np.empty_like(max_temp, dtype="<U20")
 
         hdate_rf = np.select(
             [
@@ -602,14 +638,11 @@ class WorldCrop(WorldActivity):
         hdate = np.where(self.sdate < hdate, hdate, hdate + 365)
 
         husum = xr.full_like(self.sdate, 0, dtype=int)
+
         # Duplicate daily temperature to allow cross-year growth
         temp_values = xr.DataArray(
-            np.repeat(
-                daily_temp["value"],
-                repeats=2,
-                axis=1
-            ),
-            coords={"day": np.arange(1, 2*365+1)},
+            xr.concat([daily_temp["value"], daily_temp["value"]], dim="day"),
+            coords={"cell": self.sdate.cell, "day": np.arange(1, 2*365+1)}
         )
         day_values = xr.DataArray(
             np.arange(1, 2*365+1),
@@ -633,11 +666,13 @@ class WorldCrop(WorldActivity):
         # Negate if using "tv" model
         if phen_model == "tv":
             husum *= -1
+        else:
+            husum = husum.where(self.winter_crop == 1, -husum)
 
         return husum
 
 
-class WorldCrops(WorldActivity):
+class WorldCropSet(WorldActivity):
 
     def __init__(self, crop_param_file="crop_calendar/crop_parameters.csv", **kwargs):
         super().__init__(**kwargs)
@@ -663,7 +698,7 @@ class WorldCrops(WorldActivity):
         """
         self.bands = self.actual_landuse.band.values.tolist()
         self.names = {
-            WorldCrops.irrigation_pattern.sub("", band).strip()
+            WorldCropSet.irrigation_pattern.sub("", band).strip()
             for band in self.bands  # noqa
         }
         self.calendars = {
@@ -713,13 +748,12 @@ class WorldCrops(WorldActivity):
 
         return seasonality
 
-    @property
-    def monthly_climate(self):
+    def get_monthly_climate(self):
         """
         Return monthly climate data for the cell.
         """
         # Average temperature of the cell
-        temp = self.var("temp", avg="monthly")
+        temp = self.get_output("temp", avg="monthly")
         daily_temp = interpolate_monthly_to_daily(temp)
 
         min_temp = temp.min(dim="band")
@@ -728,12 +762,12 @@ class WorldCrops(WorldActivity):
         argmax_temp = temp.argmax(dim="band")
 
         # average temperature of the cell
-        prec = self.var("prec", avg="monthly")
+        prec = self.get_output("prec", avg="monthly")
 
         # Fix unrealistic low PET values
-        pre_pet = np.maximum(self.var("pet"), 1e-1)
+        pre_pet = np.maximum(self.get_output("pet"), 1e-1)
 
-        ppet = (self.var("prec") / pre_pet).mean("time", skipna=True)
+        ppet = (self.get_output("prec") / pre_pet).mean("time", skipna=True)
 
         daily_ppet = interpolate_monthly_to_daily(ppet)
 
@@ -758,57 +792,15 @@ class WorldCrops(WorldActivity):
             "daily_ppet_diff": daily_ppet_diff
         }
 
-    def set_input(self, name, value, crop, system="short"):
-        """
-        Set the cell input data for the crop.
-
-        :param name: Input data name.
-        :type name: str
-        :param value: Input data value.
-        :type value: float
-        :param crop: Crop name.
-        :type crop: str
-        :param system: Irrigation system of either long ("rainfed",
-        "surface irrigated", "sprinkler irrigated", "drip irrigated") or short
-        ("rainfed", "irrigated") or "short" for all two / "long" for all four.
-        :type system: str
-        """
-
-        # Determine the irrigation systems (avoid redundant checks)
-        if system == "short":
-            all_systems = WorldCrop.irrigation_systems_short
-        elif system == "long":
-            all_systems = WorldCrop.irrigation_systems_long
-        elif system in WorldCrop.irrigation_systems_short or system in WorldCrop.irrigation_systems_long:
-            all_systems = [system]
-        else:
-            raise ValueError("Invalid irrigation system")
-
-        # Avoid unnecessary list creation and directly build the band string
-        systems_str = [f"{irrig} {crop}" for irrig in all_systems]
-
-        # Vectorized check against the 'band' column
-        mask = ~self.world.input[name]['band'].isin([f"{irrig} {crop}" for irrig in all_systems]).expand_dims({"cell":self.world.grid.cell})
-
-        value = xr.align(mask, value, join="left")[1]
-        # Expand mask to match the shape of `values` (assuming dim order: [bands, cells])
-        self.world.input[name].values = self.world.input[name].where(mask, value).values
-
     def calc_calendar(self):
         """Calculate the crop calendar for each crop in calendars."""
-        monthly_climate = self.monthly_climate
+        monthly_climate = self.get_monthly_climate()
         seasonality = self.calc_seasonality(monthly_climate)
 
         for crop in self.calendars:
             # calculate sowing date
             self[crop].calc_sowing_date(monthly_climate, seasonality)
-            # write sowing date to cell input
-            self.set_input(
-                name="sdate",
-                value=self[crop].sdate,
-                crop=crop,
-                system="short"
-            )
+
             # calculate harvest rule
             self[crop].calc_harvest_rule(monthly_climate, seasonality)
 
@@ -818,23 +810,61 @@ class WorldCrops(WorldActivity):
             # calculate harvest date, choose the best option
             self[crop].calc_harvest_date(monthly_climate, seasonality)
 
-            
-            self.phu = xr.concat([
-                self[crop].calc_phu(monthly_climate["daily_temp"], self[crop].hdate_rf),
-                self[crop].calc_phu(monthly_climate["daily_temp"], self[crop].hdate_ir)
-            ], dim="band").assign_coords({"band": self[crop].names}).transpose("cell", "band")
+            self[crop].phu_rf = self[crop].calc_phu(monthly_climate["daily_temp"], self[crop].hdate_rf)
+            self[crop].phu_ir = self[crop].calc_phu(monthly_climate["daily_temp"], self[crop].hdate_ir)
 
-            # write phu rainfed to cell input
-            self.set_input(
-                name="crop_phu",
-                value=self.phu,
-                crop=crop,
-                system="short"
+        self.update_calendar()
+    
+    def update_calendar(self):
+
+        base_array = self.world.input.sdate
+        base_array.time.values[0] = np.datetime64(
+            f"{self.world.model.lpjml.sim_year}-12-31"
+        )
+
+        sdate = xr.full_like(base_array, -9999, dtype=int)
+        sdate.name = "sdate"
+
+        hdate = xr.full_like(base_array, -9999, dtype=int)
+        hdate.name = "hdate"
+
+        hreason = xr.full_like(base_array, "", dtype="<U20")
+        hreason.name = "hreason"
+
+        crop_phu = xr.full_like(base_array, -9999, dtype=int)
+        crop_phu.name = "crop_phu"
+
+        for crop in self.calendars:
+            sdate.loc[{"band": [f"rainfed {crop}", f"irrigated {crop}"]}] = self[crop].sdate
+
+            hdate.loc[{"band": f"rainfed {crop}"}] = self[crop].hdate_rf
+            hdate.loc[{"band": f"irrigated {crop}"}] = self[crop].hdate_ir
+
+            hreason.loc[{"band": f"rainfed {crop}"}] = self[crop].hreason_rf
+            hreason.loc[{"band": f"irrigated {crop}"}] = self[crop].hreason_ir
+
+            crop_phu.loc[{"band": f"rainfed {crop}"}] = self[crop].phu_rf
+            crop_phu.loc[{"band": f"irrigated {crop}"}] = self[crop].phu_ir
+
+
+        if self.world.calendar is None:
+            self.world.calendar = LPJmLDataSet(
+                {
+                    "sdate": sdate,
+                    "hdate": hdate,
+                    "hreason": hreason,
+                    "crop_phu": crop_phu
+                }
             )
+        else:
+            self.world.calendar.sdate.values = sdate.values
+            self.world.calendar.hdate.values = hdate.values
+            self.world.calendar.hreason.values = hreason.values
+            self.world.calendar.crop_phu.values = crop_phu.values
 
     def update(self):
         """
-        Update the WorldCrops object.
+        Update the WorldCropSet object.
         """
         self.update_landuse()
         self.calc_calendar()
@@ -976,7 +1006,6 @@ def get_midday(even=True):
         midday = midday.astype(np.int32)
     
     return midday
-
 
 def calc_doy_wet_month(daily_ppet):
     """

@@ -41,30 +41,25 @@ class Component:
 
     def write_output_csv(self, df, init=False):
         """Write output data"""
-        mode = (
-            "w"
-            if (self.lpjml.sim_year == self.config.start_coupling and init)  # noqa
-            else "a"
-        )
 
-        # define the file name and header row
-        file_name = f"{self.config.sim_path}/output/{self.config.sim_name}/inseeds_data.csv"  # noqa
-
-        if not os.path.isfile(file_name) or mode == "w":
+        if self.lpjml.sim_year == self.config.start_coupling and init:
             header = True
+            mode = "w"
         else:
             header = False
+            mode = "a"
+
+        # define the file name and header row
+        file_name = f"{self.config.sim_path}/output/{self.config.sim_name}/landmanager_data.csv"  # noqa
 
         df.to_csv(file_name, mode=mode, header=header, index=False)
 
     def write_output_parquet(self, df, init=False):
         """Write output data to Parquet file"""
-        file_name = f"{self.config.sim_path}/output/{self.config.sim_name}/inseeds_data.parquet"  # noqa
+        file_name = f"{self.config.sim_path}/output/{self.config.sim_name}/landmanager_data.parquet"  # noqa
 
         # Append mode: write new data without rewriting the file.
-        if not os.path.isfile(file_name) or (
-            self.lpjml.sim_year == self.config.start_coupling and init
-        ):
+        if self.lpjml.sim_year == self.config.start_coupling and init:
             df.to_parquet(file_name, engine="pyarrow", index=False)
         else:
             # Read the existing data

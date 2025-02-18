@@ -1,4 +1,4 @@
-"""Farmer entity type class of inseeds_farmer_management
+"""Farmer entity type class of the management component.
 """
 
 
@@ -32,7 +32,7 @@ class Farmer(core.Individual, base.Individual):
     def init_coupled_attributes(self):
         """Initialize the mapped variables from the LPJmL output to the farmers"""
 
-        # get the coupling map (inseeds to lpjml names) from the configuration
+        # get the coupling map (landmanager to lpjml names) from the configuration
         self.coupling_map = self.model.config.coupled_config.coupling_map.to_dict()
 
         # set control run argument

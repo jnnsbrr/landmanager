@@ -10,42 +10,30 @@ from landmanager.components.management import crop_calendar
 from landmanager.components import lpjml
 
 
-# class Farmer(crop_calendar.Farmer):
-#     """Farmer entity type."""
-# 
-#     pass
-
-
-class Cell(management.Cell):
+class Cell(crop_calendar.Cell):
     """Cell entity type."""
-
-    pass
+    output_variables = base.Output(
+        sdate=Variable(
+            "sowing date",
+            "sowing date of calendar crops",
+            unit=DAU.doy,
+        ),
+        hdate=Variable(
+            "harvest date",
+            "harvest date of calendar crops",
+            unit=DAU.doy,
+        ),
+        hreason=Variable(
+            "harvest reason",
+            "harvest reason of calendar crops",
+        )
+    )
 
 
 class World(crop_calendar.World):
     """World entity type."""
 
-    output_variables = base.Output(
-        hdate_ir=Variable(
-            "harvest date irrigated",
-            "harvest date of irrigated crops",
-            unit=DAU.doy,
-        ),
-        hdate_rf=Variable(
-            "harvest date irrigated",
-            "harvest date of irrigated crops",
-            unit=DAU.doy,
-        ),
-        hreason_rf=Variable(
-            "harvest reason rainfed",
-            "harvest reason for rainfed crops",
-        ),
-        hreason_ir=Variable(
-            "harvest reason irrigated",
-            "harvest reason for irrigated crops",
-        ),
-    )
-
+    pass
 
 
 
@@ -76,15 +64,21 @@ class Model(lpjml.Component, management.Component):
             country=self.lpjml.country,
             area=self.lpjml.terr_area,
         )
-        initialize cells
-        self.init_cells(model=self, cell_class=Cell)
-
-        # initialize farmers
-        # self.init_farmers(farmer_class=Farmer)
+        # initialize cells
+        # self.init_cells(
+        #     model=self,
+        #     cell_class=Cell,
+        #     world_views=["calendar"]
+        # )
+        # self.write_output_table(
+        #     file_format=self.config.coupled_config.output_settings.file_format,
+        #     init=True
+        # )
 
     def update(self, t):
         super().update(t)
-        self.write_output_table(
-            file_format=self.config.coupled_config.output_settings.file_format
-        )
+        # self.write_output_table(
+        #     file_format=self.config.coupled_config.output_settings.file_format,
+        #     init=False
+        # )
         self.update_lpjml(t)

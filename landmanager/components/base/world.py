@@ -17,7 +17,6 @@ class World(Entity):
     def output_table(self):
         variables = self.get_defined_outputs()
 
-        breakpoint()
         if not variables:
             return pd.DataFrame()
         else:

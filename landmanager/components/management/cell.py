@@ -1,4 +1,4 @@
-"""Farmer entity type class of inseeds_farmer_management
+"""Cell entity type class for the management component.
 """
 
 

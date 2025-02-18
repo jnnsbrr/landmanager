@@ -1,11 +1,8 @@
-"""The inseeds_farmer_mnagement.world class.
+"""The management world class.
 """
 
 from landmanager.components import base
 import pycopanlpjml as lpjml
-
-
-
 
 
 class World(lpjml.World, base.World):

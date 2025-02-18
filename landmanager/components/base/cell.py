@@ -18,20 +18,22 @@ class Cell(Entity):
 
         if not variables:
             return pd.DataFrame()
-        else:
-            df = super().output_table
+        
+        df = super().output_table
 
-            df.insert(1, "cell", [self.grid.cell.item()] * len(variables))
-            df.insert(2, "lon", [self.grid.cell.lon.item()] * len(variables))
-            df.insert(3, "lat", [self.grid.cell.lat.item()] * len(variables))
+        num_rows = len(df)
 
-            if hasattr(self, "country"):
-                df.insert(4, "country", [self.country.item()] * len(variables))
-            if hasattr(self, "area"):
-                df.insert(
-                    5,
-                    "area [km2]",
-                    [round(self.area.item() * 1e-6, 4)] * len(variables),
-                )
+        if num_rows == 0:
+            return df  # Avoid unnecessary operations
 
-            return df
+        # Efficient column additions using assignment (faster than DataFrame.insert)
+        df["cell"] = self.grid.cell.item()
+        df["lon"] = self.grid.cell.lon.item()
+        df["lat"] = self.grid.cell.lat.item()
+
+        if hasattr(self, "country"):
+            df["country"] = self.country.item()
+        if hasattr(self, "area"):
+            df["area [km2]"] = round(self.area.item() * 1e-6, 4)
+
+        return df

@@ -5,11 +5,10 @@ lpjml_settings:
     iso_country_code: true
 # Variables to be written to copan_core_data table file 
 output:
-    world:
-        - "hdate_ir"
-        - "hdate_rf"
-        - "hreason_rf"
-        - "hreason_ir"
+    cell:
+        - "sdate"
+        - "hdate"
+        - "hreason"
 
 # Define how copan_core_data table file should be written
 output_settings:
