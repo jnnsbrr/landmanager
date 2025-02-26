@@ -1,5 +1,4 @@
-"""Cell entity type class of the Crop Calendar component.
-"""
+"""Cell entity type class of the Crop Calendar component."""
 
 import numpy as np
 from enum import Enum
@@ -18,7 +17,7 @@ class Cell(management.Cell):
         # hold the input data for LPJmL on cell level
         if calendar is not None:
             self.calendar = calendar
-    
+
     @property
     def sdate(self):
         """Get the sowing date of the crop."""
@@ -33,3 +32,8 @@ class Cell(management.Cell):
     def hreason(self):
         """Get the harvest reason of the crop."""
         return self.calendar.hreason
+
+    @property
+    def crop_phu(self):
+        """Get the harvest reason of the crop."""
+        return self.calendar.crop_phu

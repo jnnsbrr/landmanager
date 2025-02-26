@@ -1,5 +1,4 @@
-"""The management world class.
-"""
+"""The management world class."""
 
 from landmanager.components import base
 import pycopanlpjml as lpjml

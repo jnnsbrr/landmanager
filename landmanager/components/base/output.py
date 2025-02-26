@@ -1,5 +1,4 @@
-"""Output writing class.
-"""
+"""Output writing class."""
 
 
 class Output:

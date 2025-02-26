@@ -18,7 +18,7 @@ class Cell(Entity):
 
         if not variables:
             return pd.DataFrame()
-        
+
         df = super().output_table
 
         num_rows = len(df)

@@ -5,11 +5,8 @@ lpjml_settings:
     iso_country_code: true
 # Variables to be written to copan_core_data table file 
 output:
-    cell:
-        - "sdate"
-        - "hdate"
-        - "hreason"
-        - "crop_phu"
+    farmer:
+        - "reasoning"
 
 # Define how copan_core_data table file should be written
 output_settings:
@@ -17,8 +14,7 @@ output_settings:
     file_format: "csv" # "parquet" "csv"
 
 # Define which farmer variables map with coupled LPJmL input variables
-# coupling_map:
-#     tillage: ["sdate", "crop_phu"]
-#     # residues: ["residue_on_field"]
+coupling_map:
+    # fert: ["sdate", "crop_phu"]
 
 control_run: False

@@ -52,7 +52,7 @@ class Component:
         # define the file name and header row
         file_name = f"{self.config.sim_path}/output/{self.config.sim_name}/landmanager_data.csv"  # noqa
 
-        df.to_csv(file_name, mode=mode, header=header, index=False)
+        df.to_csv(file_name, mode=mode, header=header, index=False, sep=';')
 
     def write_output_parquet(self, df, init=False):
         """Write output data to Parquet file"""

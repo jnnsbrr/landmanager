@@ -6,51 +6,38 @@ from pycopancore.data_model.master_data_model.dimensions_and_units import (
 
 from landmanager.components import base
 from landmanager.components import management
-from landmanager.components.management import crop_calendar
+from landmanager.components.management import llm_fertilization
 from landmanager.components import lpjml
 
 
-class Cell(crop_calendar.Cell):
+class Cell(llm_fertilization.Cell):
     """Cell entity type."""
+    pass
+
+
+class Farmer(llm_fertilization.Farmer):
 
     output_variables = base.Output(
-        sdate=Variable(
-            "sowing date",
-            "sowing date of calendar crops",
-            unit=DAU.doy,
-        ),
-        hdate=Variable(
-            "harvest date",
-            "harvest date of calendar crops",
-            unit=DAU.doy,
-        ),
-        hreason=Variable(
-            "harvest reason",
-            "harvest reason of calendar crops",
-            unit=None,
-        ),
-        crop_phu=Variable(
-            "crop phenological unit",
-            "crop phenological unit",
-            unit=None,
+        reasoning=Variable(
+            "decision reasoning",
+            "decision reasoning behind fertilization",
         ),
     )
 
 
-class World(crop_calendar.World):
+class World(management.World):
     """World entity type."""
 
     pass
 
 
-class Model(lpjml.Component, management.Component):
+class Model(lpjml.Component, llm_fertilization.Component):
     """Model class for the InSEEDS Social model integrating the LPJmL model and
     coupling component as well as the farmer management component.
     """
 
-    name = "InSEEDS farmer management"
-    description = "InSEEDS farmer management model representing only social \
-    dynamics and decision-making on the basis of the TPB"
+    name = "LLM fertilization"
+    description = ""
 
     def __init__(self, **kwargs):
         """Initialize an instance of World."""
@@ -71,7 +58,14 @@ class Model(lpjml.Component, management.Component):
             area=self.lpjml.terr_area,
         )
         # initialize cells
-        self.init_cells(model=self, cell_class=Cell, world_views=["calendar"])
+        self.init_cells(
+            model=self,
+            cell_class=Cell
+        )
+
+        # initialize farmers
+        self.init_farmers(farmer_class=Farmer)
+
         self.write_output_table(
             file_format=self.config.coupled_config.output_settings.file_format,
             init=True,

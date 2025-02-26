@@ -1,6 +1,4 @@
-"""Farmer entity type class of the management component.
-"""
-
+"""Farmer entity type class of the management component."""
 
 import numpy as np
 
@@ -32,11 +30,14 @@ class Farmer(core.Individual, base.Individual):
     def init_coupled_attributes(self):
         """Initialize the mapped variables from the LPJmL output to the farmers"""
 
-        # get the coupling map (landmanager to lpjml names) from the configuration
-        self.coupling_map = self.model.config.coupled_config.coupling_map.to_dict()
-
         # set control run argument
         self.control_run = self.model.config.coupled_config.control_run
+
+        if self.model.config.coupled_config.coupling_map is None:
+            return
+
+        # get the coupling map (landmanager to lpjml names) from the configuration
+        self.coupling_map = self.model.config.coupled_config.coupling_map.to_dict()
 
         # set the mapped variables from the farmers to the LPJmL input
         for attribute, lpjml_attribute in self.coupling_map.items():
@@ -60,12 +61,14 @@ class Farmer(core.Individual, base.Individual):
     @property
     def farmers(self):
         """Return the set of all farmers in the neighbourhood."""
-        return [farmer for farmer in cell.individuals if isinstance(farmer, self.__class__)]
+        return [
+            farmer for farmer in cell.individuals if isinstance(farmer, self.__class__)
+        ]
 
     @property
     def cell_cropyield(self):
         """Return the average crop yield of the cell."""
-        return self.cell.output.harvestc.values
+        return np.sum(self.cell.output.pft_harvestc.values * self.cell.output.cftfrac.values)
 
     @property
     def cell_avg_hdate(self):

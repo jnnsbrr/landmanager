@@ -1,6 +1,4 @@
-"""Cell entity type class for the management component.
-"""
-
+"""Cell entity type class for the management component."""
 
 import numpy as np
 from enum import Enum

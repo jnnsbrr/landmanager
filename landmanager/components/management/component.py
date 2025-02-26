@@ -26,9 +26,6 @@ class Component(base.Component):
             farmer = farmer_class(cell=cell, model=self)
             farmers.append(farmer)
 
-        # sort farmers by average harvest date (ascending)
-        farmers_sorted = sorted(farmers, key=lambda farmer: farmer.avg_hdate)
-
         # init neighbourhood for each farmer
         # for farmer in farmers_sorted:
         #     farmer.init_neighbourhood()
@@ -53,6 +50,7 @@ class Component(base.Component):
                 farmer = farmer_class(cell=cell, model=self)
                 farmers.append(farmer)
                 change = True
+
             elif not cell.farmers:
                 continue
             elif cell.is_old_landuse:
@@ -77,13 +75,14 @@ class Component(base.Component):
         """
 
         # update cell state
-        # for cell in self.world.cells:
-        #     cell.update(t)
+        for cell in self.world.cells:
+            cell.update(t)
 
         self.world.update(t)
         # update initialization (or deactivation) of farmers
-        # farmers_sorted = self.update_farmers()
+        if self.world.farmers:
+            farmers_sorted = self.update_farmers()
 
-        # update farmer behaviour
-        # for farmer in farmers_sorted:
-        #     farmer.update(t)
+            # update farmer behaviour
+            for farmer in farmers_sorted:
+                farmer.update(t)
