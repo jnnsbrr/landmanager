@@ -1,7 +1,5 @@
 import pandas as pd
 import numpy as np
-import xarray as xr
-from pycoupler.data import LPJmLData
 
 from . import Output
 
@@ -113,10 +111,7 @@ class Entity:
             return [
                 var
                 for var in self.__class__.output_variables.names
-                if var
-                in self.model.config.coupled_config.output.to_dict()[
-                    class_name
-                ]
+                if var in self.model.config.coupled_config.output.to_dict()[class_name]  # noqa
             ]
 
     def update(self, t):

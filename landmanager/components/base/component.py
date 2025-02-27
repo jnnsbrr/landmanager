@@ -1,8 +1,5 @@
-import os
 import sys
 import pandas as pd
-import pyarrow as pa
-import pyarrow.parquet as pq
 
 
 class Component:
@@ -19,15 +16,13 @@ class Component:
 
         # get all cell outputs
         if hasattr(self.world, "cells"):
-            df = pd.concat(
-                [df] + [cell.output_table for cell in self.world.cells]
-            )
+            df = pd.concat([df] + [cell.output_table for cell in self.world.cells])  # noqa
 
         # get all farmer outputs
         if hasattr(self.world, "farmers"):
             df = pd.concat(
                 [df] + [farmer.output_table for farmer in self.world.farmers]
-            )
+            )  # noqa
 
         return df
 

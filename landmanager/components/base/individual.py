@@ -1,5 +1,3 @@
-import os
-import sys
 import pandas as pd
 
 from . import Entity
@@ -21,17 +19,11 @@ class Individual(Entity):
             df = super().output_table
 
             df.insert(1, "cell", [self.cell.grid.cell.item()] * len(variables))
-            df.insert(
-                2, "lon", [self.cell.grid.cell.lon.item()] * len(variables)
-            )
-            df.insert(
-                3, "lat", [self.cell.grid.cell.lat.item()] * len(variables)
-            )
+            df.insert(2, "lon", [self.cell.grid.cell.lon.item()] * len(variables))  # noqa
+            df.insert(3, "lat", [self.cell.grid.cell.lat.item()] * len(variables))  # noqa
 
             if hasattr(self.cell, "country"):
-                df.insert(
-                    4, "country", [self.cell.country.item()] * len(variables)
-                )
+                df.insert(4, "country", [self.cell.country.item()] * len(variables))  # noqa
             if hasattr(self.cell, "area"):
                 df.insert(
                     5,

@@ -39,9 +39,7 @@ class Farmer(core.Individual, base.Individual):
 
         # get the coupling map (landmanager to lpjml names) from the
         #   configuration
-        self.coupling_map = (
-            self.model.config.coupled_config.coupling_map.to_dict()
-        )
+        self.coupling_map = self.model.config.coupled_config.coupling_map.to_dict()  # noqa
 
         # set the mapped variables from the farmers to the LPJmL input
         for attribute, lpjml_attribute in self.coupling_map.items():
@@ -68,25 +66,22 @@ class Farmer(core.Individual, base.Individual):
         return [
             farmer
             for farmer in self.cell.individuals
-            if isinstance(farmer, self.__class__)
+            if isinstance(farmer, self.__class__)  # noqa
         ]
 
     @property
     def cell_cropyield(self):
         """Return the average crop yield of the cell."""
         return np.sum(
-            self.cell.output.pft_harvestc.values
-            * self.cell.output.cftfrac.values
-        )
+            self.cell.output.pft_harvestc.values * self.cell.output.cftfrac.values  # noqa
+        )  # noqa
 
     @property
     def cell_avg_hdate(self):
         """Return the average harvest date of the cell."""
         crop_idx = [
             i
-            for i, item in enumerate(
-                self.cell.output.cftfrac.band.values.tolist()
-            )
+            for i, item in enumerate(self.cell.output.cftfrac.band.values.tolist())  # noqa
             if any(x in item for x in self.model.config.cftmap)
         ]
         if np.sum(self.cell.output.cftfrac.isel(band=crop_idx).values) == 0:
