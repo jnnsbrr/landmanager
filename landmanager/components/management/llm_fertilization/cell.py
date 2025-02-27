@@ -1,9 +1,5 @@
 """Cell entity type class of the Crop Calendar component."""
 
-import numpy as np
-from enum import Enum
-
-import pycopanlpjml as lpjml
 from landmanager.components import management
 
 

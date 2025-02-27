@@ -46,7 +46,7 @@ config_historic.set_transient(
 # management settings
 config_historic.tillage_type = "read"
 config_historic.residue_treatment = "read_residue_data"
-config_historic.double_harvest = False
+config_historic.separate_harvests = False
 
 # write config (Config object) as json file
 config_historic_fn = config_historic.to_json()

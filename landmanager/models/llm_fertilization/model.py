@@ -12,6 +12,7 @@ from landmanager.components import lpjml
 
 class Cell(llm_fertilization.Cell):
     """Cell entity type."""
+
     pass
 
 
@@ -58,10 +59,7 @@ class Model(lpjml.Component, llm_fertilization.Component):
             area=self.lpjml.terr_area,
         )
         # initialize cells
-        self.init_cells(
-            model=self,
-            cell_class=Cell
-        )
+        self.init_cells(model=self, cell_class=Cell)
 
         # initialize farmers
         self.init_farmers(farmer_class=Farmer)

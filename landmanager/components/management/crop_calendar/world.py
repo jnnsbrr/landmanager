@@ -58,7 +58,9 @@ class World(management.World):
 
         # Expand mask to match the shape of `values`
         #   (assuming dim order: [bands, cells])
-        self.input[name].values[:] = self.input[name].where(mask, value).values[:] # noqa
+        self.input[name].values[:] = (
+            self.input[name].where(mask, value).values[:]
+        )  # noqa
 
 
 class WorldActivity:
@@ -75,9 +77,7 @@ class WorldActivity:
         "drip irrigated",
     ]
 
-    irrigation_systems = set(
-        irrigation_systems_short + irrigation_systems_long
-    )
+    irrigation_systems = set(irrigation_systems_short + irrigation_systems_long)
 
     irrigation_pattern = re.compile(
         r"^(?:" + "|".join(map(re.escape, irrigation_systems)) + r")\s*"  # noqa
@@ -182,7 +182,9 @@ class WorldCrop(WorldActivity):
         lowest_temp = world_output.temp.min(dim=["time", "band"])
 
         # Calculate the growing period
-        grow_period = xr.where(sdate <= hdate, hdate - sdate, 365 + hdate - sdate) # noqa
+        grow_period = xr.where(
+            sdate <= hdate, hdate - sdate, 365 + hdate - sdate
+        )  # noqa
 
         # Conditions for winter crop classification based on latitude and
         #   temperature
@@ -237,10 +239,14 @@ class WorldCrop(WorldActivity):
         argmin_temp = monthly_climate["argmin_temp"]
 
         # First day of spring
-        firstspringdoy = calc_doy_cross_threshold(daily_temp, self.temp_spring).get( # noqa
+        firstspringdoy = calc_doy_cross_threshold(
+            daily_temp, self.temp_spring
+        ).get(  # noqa
             "doy_cross_up", -9999
         )
-        firstspringdoy = xr.where(firstspringdoy == -9999, default_doy, firstspringdoy) # noqa
+        firstspringdoy = xr.where(
+            firstspringdoy == -9999, default_doy, firstspringdoy
+        )  # noqa
         firstspringmonth = doy2month(firstspringdoy)
 
         # Define masks for different winter types
@@ -256,20 +262,26 @@ class WorldCrop(WorldActivity):
 
         # Warm winter case: sowing 2.5 months before coldest midday
         coldestday = self.midday[argmin_temp]
-        firstwinterdoy = xr.where(warm_winter, (coldestday - 75) % 365, firstwinterdoy) # noqa
+        firstwinterdoy = xr.where(
+            warm_winter, (coldestday - 75) % 365, firstwinterdoy
+        )  # noqa
 
         # Cold winter case: No winter sowing
         firstwinterdoy = xr.where(cold_winter, -9999, firstwinterdoy)
 
         # Mild winter case: threshold-based
         mild_winter = ~warm_winter & ~cold_winter
-        mild_winter_doy = calc_doy_cross_threshold(daily_temp, self.temp_fall).get( # noqa
+        mild_winter_doy = calc_doy_cross_threshold(
+            daily_temp, self.temp_fall
+        ).get(  # noqa
             "doy_cross_down", -9999
         )
         firstwinterdoy = xr.where(mild_winter, mild_winter_doy, firstwinterdoy)
 
         # Ensure default values
-        firstwinterdoy = xr.where(firstwinterdoy == -9999, default_doy, firstwinterdoy) # noqa
+        firstwinterdoy = xr.where(
+            firstwinterdoy == -9999, default_doy, firstwinterdoy
+        )  # noqa
         firstwintermonth = doy2month(firstwinterdoy)
 
         # Determine sowing date based on calculation method
@@ -367,7 +379,9 @@ class WorldCrop(WorldActivity):
 
         # Mapping seasonality to corresponding rule offsets
         seasonality_mapping = xr.where(
-            seasonality == "NO_SEASONALITY", 1, np.where(seasonality == "PREC", 2, 3) # noqa
+            seasonality == "NO_SEASONALITY",
+            1,
+            np.where(seasonality == "PREC", 2, 3),  # noqa
         )
         rule_name_suffix = xr.where(
             seasonality == "NO_SEASONALITY",
@@ -379,7 +393,10 @@ class WorldCrop(WorldActivity):
 
         # Vectorized rule offset computation
         rule_offset = np.select(
-            [max_temp <= self.temp_base_rphase, max_temp <= self.temp_opt_rphase], # noqa
+            [
+                max_temp <= self.temp_base_rphase,
+                max_temp <= self.temp_opt_rphase,
+            ],  # noqa
             # Corresponds to t-low and t-mid
             [0, 3],
             # t-high
@@ -387,7 +404,10 @@ class WorldCrop(WorldActivity):
         )
 
         rule_prefixes = np.select(
-            [max_temp <= self.temp_base_rphase, max_temp <= self.temp_opt_rphase], # noqa
+            [
+                max_temp <= self.temp_base_rphase,
+                max_temp <= self.temp_opt_rphase,
+            ],  # noqa
             ["t-low", "t-mid"],
             default="t-high",
         )
@@ -418,7 +438,9 @@ class WorldCrop(WorldActivity):
         hdate_maxrp = sdate + self.maxrp_growingseason
         # Longest cycle: crop upper biological limit
         hdate_last = sdate + np.where(
-            sseason == "winter", self.max_growingseason_wt, self.max_growingseason_st # noqa
+            sseason == "winter",
+            self.max_growingseason_wt,
+            self.max_growingseason_st,  # noqa
         )
 
         # End of wet season
@@ -427,7 +449,9 @@ class WorldCrop(WorldActivity):
         doy_wet1 = calc_doy_cross_threshold(daily_ppet, self.ppet_ratio)[
             "doy_cross_down"
         ]
-        doy_wet2 = calc_doy_cross_threshold(daily_ppet_diff, self.ppet_ratio_diff)[ # noqa
+        doy_wet2 = calc_doy_cross_threshold(
+            daily_ppet_diff, self.ppet_ratio_diff
+        )[  # noqa
             "doy_cross_down"
         ]
 
@@ -443,7 +467,9 @@ class WorldCrop(WorldActivity):
         hdate_wetseas = np.where(
             doy_wet1 == -9999,
             np.where(
-                monthly_climate["min_ppet"] >= self.ppet_min, hdate_last, hdate_first # noqa
+                monthly_climate["min_ppet"] >= self.ppet_min,
+                hdate_last,
+                hdate_first,  # noqa
             ),
             doy_wet_first + self.rphase_duration,
         )
@@ -451,15 +477,19 @@ class WorldCrop(WorldActivity):
         # Warmest day of the year
         warmest_day = self.midday[monthly_climate["argmax_temp"]]
         hdate_temp_base = np.where(
-            sseason == "winter", warmest_day, warmest_day + self.rphase_duration # noqa
+            sseason == "winter", warmest_day, warmest_day + self.rphase_duration  # noqa
         )
 
         # First and last hot day
         daily_temp = monthly_climate["daily_temp"]
-        doy_exceed_opt_rp = calc_doy_cross_threshold(daily_temp, self.temp_opt_rphase)[ # noqa
+        doy_exceed_opt_rp = calc_doy_cross_threshold(
+            daily_temp, self.temp_opt_rphase
+        )[  # noqa
             "doy_cross_up"
         ]
-        doy_below_opt_rp = calc_doy_cross_threshold(daily_temp, self.temp_opt_rphase)[ # noqa
+        doy_below_opt_rp = calc_doy_cross_threshold(
+            daily_temp, self.temp_opt_rphase
+        )[  # noqa
             "doy_cross_down"
         ]
 
@@ -476,23 +506,33 @@ class WorldCrop(WorldActivity):
         )
 
         # Winter type: First hot day; Spring type: Last hot day
-        doy_opt_rp = np.where(sseason == "winter", doy_exceed_opt_rp, doy_below_opt_rp) # noqa
+        doy_opt_rp = np.where(
+            sseason == "winter", doy_exceed_opt_rp, doy_below_opt_rp
+        )  # noqa
         hdate_temp_opt = np.where(
             doy_opt_rp == -9999,
             hdate_maxrp,
             np.where(
-                sseason != "winter", doy_opt_rp + self.rphase_duration, doy_opt_rp # noqa
+                sseason != "winter",
+                doy_opt_rp + self.rphase_duration,
+                doy_opt_rp,  # noqa
             ),
         )
 
         hdate_wetseas = xr.where(
-            hdate_wetseas < sdate, hdate_wetseas + self.ndays_year, hdate_wetseas # noqa
+            hdate_wetseas < sdate,
+            hdate_wetseas + self.ndays_year,
+            hdate_wetseas,  # noqa
         )
         hdate_temp_base = xr.where(
-            hdate_temp_base < sdate, hdate_temp_base + self.ndays_year, hdate_temp_base # noqa
+            hdate_temp_base < sdate,
+            hdate_temp_base + self.ndays_year,
+            hdate_temp_base,  # noqa
         )
         hdate_temp_opt = xr.where(
-            hdate_temp_opt < sdate, hdate_temp_opt + self.ndays_year, hdate_temp_opt # noqa
+            hdate_temp_opt < sdate,
+            hdate_temp_opt + self.ndays_year,
+            hdate_temp_opt,  # noqa
         )
 
         return (
@@ -556,7 +596,9 @@ class WorldCrop(WorldActivity):
         # Precompute max temperature once
         max_temp = monthly_climate["max_temp"]
         hdate_rf = hdate_ir = xr.full_like(self.world.grid.cell, 0, dtype=int)
-        hreason_rf = hreason_ir = xr.full_like(self.world.grid.cell, "", dtype="<U20") # noqa
+        hreason_rf = hreason_ir = xr.full_like(
+            self.world.grid.cell, "", dtype="<U20"
+        )  # noqa
 
         hdate_rf.values = np.select(
             [
@@ -569,7 +611,9 @@ class WorldCrop(WorldActivity):
                 (sseason == "winter"),
                 (harvest_rule == 3),
                 (harvest_rule == 6) & (seasonality == "PRECTEMP"),
-                (harvest_rule == 6) & (smonth == 0) & (max_temp < self.temp_spring), # noqa
+                (harvest_rule == 6)
+                & (smonth == 0)
+                & (max_temp < self.temp_spring),  # noqa
                 (harvest_rule == 6),
                 (seasonality == "PRECTEMP"),
             ],
@@ -579,19 +623,21 @@ class WorldCrop(WorldActivity):
                 hdate_maxrp,
                 # PREC SEASONALITY
                 hdate_first,
-                np.minimum(np.maximum(hdate_first, hdate_wetseas), hdate_maxrp), # noqa
+                np.minimum(np.maximum(hdate_first, hdate_wetseas), hdate_maxrp),  # noqa
                 # WINTER SOWING SEASON
                 hdate_first,
                 np.where(
                     (smonth == 0) & (max_temp < self.temp_fall),
                     hdate_temp_opt,
-                    np.minimum(np.maximum(hdate_first, hdate_temp_base), hdate_last), # noqa
+                    np.minimum(
+                        np.maximum(hdate_first, hdate_temp_base), hdate_last
+                    ),  # noqa
                 ),
-                np.minimum(np.maximum(hdate_first, hdate_temp_opt), hdate_last), # noqa
+                np.minimum(np.maximum(hdate_first, hdate_temp_opt), hdate_last),  # noqa
                 # HARVEST RULE 3
                 hdate_first,
                 # HARVEST RULE 6
-                np.minimum(np.maximum(hdate_first, hdate_wetseas), hdate_maxrp), # noqa
+                np.minimum(np.maximum(hdate_first, hdate_wetseas), hdate_maxrp),  # noqa
                 hdate_first,
                 np.minimum.reduce(
                     [
@@ -601,7 +647,7 @@ class WorldCrop(WorldActivity):
                     ]
                 ),
                 # PRECTEMP SEASONALITY
-                np.minimum(np.maximum(hdate_first, hdate_wetseas), hdate_maxrp), # noqa
+                np.minimum(np.maximum(hdate_first, hdate_wetseas), hdate_maxrp),  # noqa
             ],
             # ELSE
             default=np.minimum.reduce(
@@ -624,7 +670,9 @@ class WorldCrop(WorldActivity):
                 (sseason == "winter"),
                 (harvest_rule == 3),
                 (harvest_rule == 6) & (seasonality == "PRECTEMP"),
-                (harvest_rule == 6) & (smonth == 0) & (max_temp < self.temp_spring), # noqa
+                (harvest_rule == 6)
+                & (smonth == 0)
+                & (max_temp < self.temp_spring),  # noqa
                 (harvest_rule == 6),
                 (seasonality == "PRECTEMP"),
             ],
@@ -640,20 +688,26 @@ class WorldCrop(WorldActivity):
                 np.where(
                     (smonth == 0) & (max_temp < self.temp_fall),
                     hdate_temp_opt,
-                    np.minimum(np.maximum(hdate_first, hdate_temp_base), hdate_last), # noqa
+                    np.minimum(
+                        np.maximum(hdate_first, hdate_temp_base), hdate_last
+                    ),  # noqa
                 ),
-                np.minimum(np.maximum(hdate_first, hdate_temp_opt), hdate_last), # noqa
+                np.minimum(np.maximum(hdate_first, hdate_temp_opt), hdate_last),  # noqa
                 # HARVEST RULE 3
                 hdate_first,
                 # HARVEST RULE 6
                 hdate_maxrp,
                 hdate_first,
-                np.minimum(np.maximum(hdate_first, hdate_temp_base), hdate_last), # noqa
+                np.minimum(
+                    np.maximum(hdate_first, hdate_temp_base), hdate_last
+                ),  # noqa
                 # PRECTEMP SEASONALITY
                 hdate_maxrp,
             ],
             # ELSE
-            default=np.minimum(np.maximum(hdate_first, hdate_temp_opt), hdate_last), # noqa
+            default=np.minimum(
+                np.maximum(hdate_first, hdate_temp_opt), hdate_last
+            ),  # noqa
         )
 
         hreason_rf.values = np.select(
@@ -707,14 +761,7 @@ class WorldCrop(WorldActivity):
         # Assign the results to self attributes
         return (hdate_rf, hdate_ir, hreason_rf, hreason_ir)
 
-    def calc_phu(
-        self,
-        daily_temp,
-        sdate,
-        hdate,
-        vern_factor=None,
-        phen_model="t"
-    ):
+    def calc_phu(self, daily_temp, sdate, hdate, vern_factor=None, phen_model="t"):
         """
         Calculate PHU requirements.
 
@@ -779,11 +826,7 @@ class WorldCrop(WorldActivity):
 
 class WorldCropSet(WorldActivity):
 
-    def __init__(
-        self,
-        crop_param_file="crop_calendar/crop_parameters.csv",
-        **kwargs
-    ):
+    def __init__(self, crop_param_file="crop_calendar/crop_parameters.csv", **kwargs):
         super().__init__(**kwargs)
 
         # Initiate attributes
@@ -818,7 +861,9 @@ class WorldCropSet(WorldActivity):
             for band in self.bands  # noqa
         }
         self.calendars = {
-            crop for crop in self.names if crop in self.parameters.cft_name.tolist() # noqa
+            crop
+            for crop in self.names
+            if crop in self.parameters.cft_name.tolist()  # noqa
         }
 
         for crop in self.parameters.cft_name:
@@ -856,14 +901,10 @@ class WorldCropSet(WorldActivity):
         no_seasonality = (var_coef_prec <= 0.4) & (var_coef_temp <= 0.01)
         prec_only = (var_coef_prec > 0.4) & (var_coef_temp <= 0.01)
         prec_temp = (
-            (var_coef_prec > 0.4) & (var_coef_temp > 0.01) & (
-                min_temp > temp_min
-            )
+            (var_coef_prec > 0.4) & (var_coef_temp > 0.01) & (min_temp > temp_min)
         )
         temp_prec = (
-            (var_coef_prec > 0.4) & (var_coef_temp > 0.01) & (
-                min_temp <= temp_min
-            )
+            (var_coef_prec > 0.4) & (var_coef_temp > 0.01) & (min_temp <= temp_min)
         )
 
         # Assign seasonality categories
@@ -928,7 +969,7 @@ class WorldCropSet(WorldActivity):
         for crop in self.calendars:
 
             # calculate sowing date
-            crop_sdate, crop_smonth, crop_sseason = self[crop].calc_sowing_date( # noqa
+            crop_sdate, crop_smonth, crop_sseason = self[crop].calc_sowing_date(  # noqa
                 monthly_climate=monthly_climate, seasonality=seasonality
             )
             self.world.calendar.sdate.loc[
@@ -936,7 +977,9 @@ class WorldCropSet(WorldActivity):
             ] = crop_sdate
 
             # calculate harvest rule
-            crop_harvest_rule, crop_harvest_rule_name = self[crop].calc_harvest_rule( # noqa
+            crop_harvest_rule, crop_harvest_rule_name = self[
+                crop
+            ].calc_harvest_rule(  # noqa
                 monthly_climate=monthly_climate, seasonality=seasonality
             )
 
@@ -949,13 +992,16 @@ class WorldCropSet(WorldActivity):
                 crop_hdate_temp_base,
                 crop_hdate_temp_opt,
             ) = self[crop].calc_harvest_options(
-                monthly_climate=monthly_climate,
-                sdate=crop_sdate,
-                sseason=crop_sseason
+                monthly_climate=monthly_climate, sdate=crop_sdate, sseason=crop_sseason
             )
 
             # calculate harvest date, choose the best option
-            crop_hdate_rf, crop_hdate_ir, crop_hreason_rf, crop_hreason_ir = self[ # noqa
+            (
+                crop_hdate_rf,
+                crop_hdate_ir,
+                crop_hreason_rf,
+                crop_hreason_ir,
+            ) = self[  # noqa
                 crop
             ].calc_harvest_date(
                 monthly_climate=monthly_climate,
@@ -970,12 +1016,8 @@ class WorldCropSet(WorldActivity):
                 hdate_temp_base=crop_hdate_temp_base,
                 hdate_temp_opt=crop_hdate_temp_opt,
             )
-            self.world.calendar.hdate.loc[{"band": f"rainfed {crop}"}] = (
-                crop_hdate_rf
-            )
-            self.world.calendar.hdate.loc[{"band": f"irrigated {crop}"}] = (
-                crop_hdate_ir
-            )
+            self.world.calendar.hdate.loc[{"band": f"rainfed {crop}"}] = crop_hdate_rf
+            self.world.calendar.hdate.loc[{"band": f"irrigated {crop}"}] = crop_hdate_ir
             self.world.calendar.hreason.loc[{"band": f"rainfed {crop}"}] = (
                 crop_hreason_rf
             )
@@ -988,9 +1030,7 @@ class WorldCropSet(WorldActivity):
                 sdate=crop_sdate,
                 hdate=crop_hdate_rf,
             )
-            self.world.calendar.crop_phu.loc[{"band": f"rainfed {crop}"}] = (
-                crop_phu_rf
-            )
+            self.world.calendar.crop_phu.loc[{"band": f"rainfed {crop}"}] = crop_phu_rf
 
             crop_phu_ir = self[crop].calc_phu(
                 daily_temp=monthly_climate["daily_temp"],
@@ -1008,18 +1048,11 @@ class WorldCropSet(WorldActivity):
         self.world.calendar = LPJmLDataSet(
             {
                 "sdate": self.world.input.sdate.copy(),
-                "hdate": xr.full_like(
-                    self.world.input.sdate, -9999, dtype=int
-                ),
-                "hreason": xr.full_like(
-                    self.world.input.sdate, "", dtype="<U20"
-                ),
+                "hdate": xr.full_like(self.world.input.sdate, -9999, dtype=int),
+                "hreason": xr.full_like(self.world.input.sdate, "", dtype="<U20"),
                 "crop_phu": self.world.input.crop_phu.copy(),
             },
-            coords={
-                "cell": self.world.input.cell,
-                "time": self.world.input.time
-            },
+            coords={"cell": self.world.input.cell, "time": self.world.input.time},
         )
         self.world.calendar.hdate.values = self.world.output.hdate.isel(
             time=[-1]
@@ -1137,17 +1170,13 @@ def calc_doy_cross_threshold(daily_value, threshold):
     is_value_above_shifted = np.roll(is_value_above, 1, axis=1)
 
     # Find days when value crosses threshold
-    value_cross_threshold = (
-        is_value_above.astype(int) - is_value_above_shifted.astype(int)
+    value_cross_threshold = is_value_above.astype(int) - is_value_above_shifted.astype(
+        int
     )
 
     # Find first crossing up/down per cell
-    day_cross_up = np.where(
-        value_cross_threshold == 1, daily_value["day"], np.inf
-    )
-    day_cross_down = np.where(
-        value_cross_threshold == -1, daily_value["day"], np.inf
-    )
+    day_cross_up = np.where(value_cross_threshold == 1, daily_value["day"], np.inf)
+    day_cross_down = np.where(value_cross_threshold == -1, daily_value["day"], np.inf)
 
     # Get minimum crossing day per cell
     day_cross_up = np.min(day_cross_up, axis=1)
@@ -1204,7 +1233,7 @@ def calc_doy_wet_month(daily_ppet):
     doys = np.arange(1, 366)
 
     x = np.array(
-        [np.sum(daily_ppet["value"][i : i + 120]) for i in range(365 - 120 + 1)] # noqa
+        [np.sum(daily_ppet["value"][i : i + 120]) for i in range(365 - 120 + 1)]  # noqa
     )
 
     return doys[np.argmax(x)]

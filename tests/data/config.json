@@ -16041,7 +16041,7 @@
     "river_routing",
     "tillage_type",
     "residue_treatment",
-    "double_harvest",
+    "separate_harvests",
     "endgrid",
     "coupled_config"
   ],
@@ -16049,7 +16049,7 @@
   "sim_path": "/p/projects/open/Jannes/copan_core/test",
   "float_grid": true,
   "fix_climate_cycle": 11,
-  "double_harvest": false,
+  "separate_harvests": false,
   "coupled_config": {
     "lpjml_settings": {
       "country_code_to_name": true,

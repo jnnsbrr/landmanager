@@ -9,9 +9,7 @@ from pycoupler.run import check_lpjml, submit_lpjml
 # paths
 sim_path = "./simulations"
 model_path = "./LPJmL"
-landmanager_config_file = (
-    "./landmanager/models/crop_calendar/config.yaml"  # noqa"
-)
+landmanager_config_file = "./landmanager/models/crop_calendar/config.yaml"  # noqa"
 
 
 # Configuration ============================================================= #
@@ -52,7 +50,7 @@ config_coupled.fix_climate_year = 2013
 config_coupled.tillage_type = "read"
 config_coupled.residue_treatment = "read_residue_data"
 
-config_coupled.double_harvest = False
+config_coupled.separate_harvests = False
 
 config_coupled.add_config(landmanager_config_file)
 

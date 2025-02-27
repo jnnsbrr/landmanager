@@ -68,7 +68,9 @@ class Farmer(core.Individual, base.Individual):
     @property
     def cell_cropyield(self):
         """Return the average crop yield of the cell."""
-        return np.sum(self.cell.output.pft_harvestc.values * self.cell.output.cftfrac.values)
+        return np.sum(
+            self.cell.output.pft_harvestc.values * self.cell.output.cftfrac.values
+        )
 
     @property
     def cell_avg_hdate(self):

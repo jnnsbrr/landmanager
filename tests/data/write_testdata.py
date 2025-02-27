@@ -58,7 +58,7 @@ config_coupled.river_routing = False
 
 config_coupled.tillage_type = "read"
 config_coupled.residue_treatment = "read_residue_data"
-config_coupled.double_harvest = False
+config_coupled.separate_harvests = False
 
 # regrid by country - create new (extracted) input files and update config file
 config_coupled.regrid(sim_path, country_code=country_code, overwrite_input=False)

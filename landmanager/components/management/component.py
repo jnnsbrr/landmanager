@@ -41,15 +41,16 @@ class Component(base.Component):
 
         # get farmers class from first farmer
         farmer_class = next(farmer for farmer in self.world.farmers).__class__
-        # init checker for any change in farmer composition (has land use changed?)
-        change = False
+        # init checker for any change in farmer composition (has land use
+        #   changed?)
+        # change = False
 
         # check for new land use
         for cell in self.world.cells:
             if cell.is_new_landuse:
                 farmer = farmer_class(cell=cell, model=self)
                 farmers.append(farmer)
-                change = True
+                # change = True
 
             elif not cell.farmers:
                 continue

@@ -108,10 +108,7 @@ class Entity:
             return [
                 var
                 for var in self.__class__.output_variables.names
-                if var
-                in self.model.config.coupled_config.output.to_dict()[
-                    class_name
-                ]
+                if var in self.model.config.coupled_config.output.to_dict()[class_name]
             ]
 
     def update(self, t):

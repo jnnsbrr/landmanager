@@ -1,5 +1,4 @@
-"""Farmer entity type class of inseeds_farmer_management
-"""
+"""Farmer entity type class of inseeds_farmer_management"""
 
 # This file is part of pycopancore.
 #
@@ -29,20 +28,25 @@ class Farmer(management.Farmer):
         super().__init__(**kwargs)  # must be the first line
 
         # TODO: mask zeros in cftfrac
-        self.name = f'Farmer {self.cell.grid.cell.item()}'
-        self.position = f'Lat: {self.cell.grid.lat.item()}, Lon: {self.cell.grid.lon.item()}' # noqa
+        self.name = f"Farmer {self.cell.grid.cell.item()}"
+        self.position = f"Lat: {self.cell.grid.lat.item()}, Lon: {self.cell.grid.lon.item()}"  # noqa
 
-        mask = xr.where(self.cell.output.cftfrac.isel(time=-1) > 0, True, False).drop("time")
-        self.crops = self.cell.output.cftfrac.isel(time=[-1]).where(mask, drop=True).to_pandas()
-        self.mem_fert = self.cell.output.cft_nfert.where(mask, drop=True).to_pandas()
-        self.mem_yield = self.cell.output.pft_harvestc.where(mask, drop=True).to_pandas()
+        mask = xr.where(self.cell.output.cftfrac.isel(time=-1) > 0, True, False).drop(  # noqa
+            "time"
+        )
+        self.crops = (
+            self.cell.output.cftfrac.isel(time=[-1]).where(mask, drop=True).to_pandas()  # noqa
+        )
+        self.mem_fert = self.cell.output.cft_nfert.where(mask, drop=True).to_pandas()  # noqa
+        self.mem_yield = self.cell.output.pft_harvestc.where(
+            mask, drop=True
+        ).to_pandas()
 
         # init llm responses
         self.reasoning = None
 
     def get_response(self, messages):
-        """ Get response from llm
-        """
+        """Get response from llm"""
         success = False
         retry = 0
         max_retries = 30
@@ -101,7 +105,7 @@ class Farmer(management.Farmer):
         Make sure your response is in this format.
         Also do not use semi-colons ";".
         """
-        messages = [{'role': 'system', 'content': question_prompt}]
+        messages = [{"role": "system", "content": question_prompt}]
         try:
             output = self.get_response(messages)
         except Exception as e:
@@ -117,12 +121,14 @@ class Farmer(management.Farmer):
             change_fertilizer = response_data[1]
 
         except Exception as e:
-            raise Exception(f"Error: {e}\nOutput: {output} could not be parsed.")
+            raise Exception(
+                f"Error: {e}\nOutput: {output} could not be parsed."
+            )
 
         # set the new fertilizer values
-        self.cell.input.fertilizer_nr.isel(time=-1).loc[
-            {'band': change_crops}
-        ] = change_fertilizer
+        self.cell.input.fertilizer_nr.isel(time=-1).loc[{"band": change_crops}] = (  # noqa
+            change_fertilizer
+        )
 
     def update(self, t):
         # call the base class update method
