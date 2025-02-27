@@ -32,7 +32,9 @@ config_spinup_fn = config_spinup.to_json()
 
 
 # create config for historic run
-config_historic = read_config(file_name="lpjml_config.cjson", model_path=model_path)
+config_historic = read_config(
+    file_name="lpjml_config.cjson", model_path=model_path
+)
 
 # set historic run configuration
 config_historic.set_transient(

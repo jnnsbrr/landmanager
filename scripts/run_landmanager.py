@@ -2,6 +2,7 @@
 
 from pycoupler.config import read_config
 from pycoupler.run import run_lpjml, check_lpjml
+
 # from pycoupler.utils import search_country
 from landmanager.models.crop_calendar import Model  # noqa
 
@@ -46,7 +47,11 @@ config_coupled.set_coupled(
         "country",
         "terr_area",
     ],
-    temporal_resolution={"temp": "monthly", "prec": "monthly", "pet": "monthly"},  # noqa
+    temporal_resolution={
+        "temp": "monthly",
+        "prec": "monthly",
+        "pet": "monthly",
+    },  # noqa
 )
 
 # only for single cells runs
@@ -81,10 +86,7 @@ config_coupled_fn = config_coupled.to_json()
 check_lpjml(config_coupled_fn)
 
 # run lpjml simulation for coupling in the background
-run_lpjml(
-    config_file=config_coupled_fn, 
-    std_to_file=False
-)
+run_lpjml(config_file=config_coupled_fn, std_to_file=False)
 
 # landmanager run ----------------------------------------------------------- #
 

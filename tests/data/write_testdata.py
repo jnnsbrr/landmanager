@@ -14,7 +14,9 @@ from landmanager.models.regenerative_tillage import Model  # noqa
 # paths
 sim_path = "./simulations"
 model_path = "./LPJmL"
-landmanager_config_file = "./landmanager/models/crop_calendar/config.yaml"  # noqa"
+landmanager_config_file = (
+    "./landmanager/models/crop_calendar/config.yaml"  # noqa"
+)
 
 # search for country code by supplying country name
 # search_country("netherlands")
@@ -23,7 +25,9 @@ country_code = "NLD"
 # Configuration ============================================================= #
 
 # create config for coupled run
-config_coupled = read_config(model_path=model_path, file_name="lpjml_config.cjson")
+config_coupled = read_config(
+    model_path=model_path, file_name="lpjml_config.cjson"
+)
 
 # set coupled run configuration
 config_coupled.set_coupled(
@@ -61,7 +65,9 @@ config_coupled.residue_treatment = "read_residue_data"
 config_coupled.separate_harvests = False
 
 # regrid by country - create new (extracted) input files and update config file
-config_coupled.regrid(sim_path, country_code=country_code, overwrite_input=False)
+config_coupled.regrid(
+    sim_path, country_code=country_code, overwrite_input=False
+)
 
 config_coupled.add_config(landmanager_config_file)
 
@@ -79,10 +85,11 @@ check_lpjml(config_coupled_fn)
 
 # run lpjml simulation for coupling in the background
 run_lpjml(
-    config_file=config_coupled_fn, std_to_file=False  # write stdout and stderr to file
+    config_file=config_coupled_fn,
+    std_to_file=False,  # write stdout and stderr to file
 )
 
-# landmanager run --------------------------------------------------------------- #
+# landmanager run ----------------------------------------------------------- #
 
 model = Model(config_file=config_coupled_fn)
 

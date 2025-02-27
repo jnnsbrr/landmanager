@@ -62,7 +62,8 @@ class Component(base.Component):
 
         farmers_sorted = sorted(farmers, key=lambda farmer: farmer.avg_hdate)
         # if change:
-        #     # TODO: rework neighbourhood update to only update affected farmers
+        #     # TODO: rework neighbourhood update to only update affected
+        #     #    farmers
         #     for farmer in farmers_sorted:
         #         farmer.init_neighbourhood()
 

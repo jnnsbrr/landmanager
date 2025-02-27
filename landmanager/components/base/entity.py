@@ -29,11 +29,15 @@ class Entity:
         for var in variables:
             var_obj = getattr(self, var, None)
             var_name = getattr(
-                getattr(self.__class__.output_variables, var, None), "name", None
+                getattr(self.__class__.output_variables, var, None),
+                "name",
+                None,
             )
             unit = getattr(
                 getattr(
-                    getattr(self.__class__.output_variables, var, None), "unit", None
+                    getattr(self.__class__.output_variables, var, None),
+                    "unit",
+                    None,
                 ),
                 "symbol",
                 None,
@@ -94,7 +98,8 @@ class Entity:
                 )
 
         return pd.DataFrame(
-            data, columns=["year", "entity", "variable", "value", "unit", "band"]
+            data,
+            columns=["year", "entity", "variable", "value", "unit", "band"],
         )
 
     def get_defined_outputs(self):
@@ -108,7 +113,10 @@ class Entity:
             return [
                 var
                 for var in self.__class__.output_variables.names
-                if var in self.model.config.coupled_config.output.to_dict()[class_name]
+                if var
+                in self.model.config.coupled_config.output.to_dict()[
+                    class_name
+                ]
             ]
 
     def update(self, t):

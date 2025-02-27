@@ -28,7 +28,8 @@ class Farmer(core.Individual, base.Individual):
         self.cropyield_previous = self.cropyield
 
     def init_coupled_attributes(self):
-        """Initialize the mapped variables from the LPJmL output to the farmers"""
+        """Initialize the mapped variables from the LPJmL output to the
+        farmers"""
 
         # set control run argument
         self.control_run = self.model.config.coupled_config.control_run
@@ -36,8 +37,11 @@ class Farmer(core.Individual, base.Individual):
         if self.model.config.coupled_config.coupling_map is None:
             return
 
-        # get the coupling map (landmanager to lpjml names) from the configuration
-        self.coupling_map = self.model.config.coupled_config.coupling_map.to_dict()
+        # get the coupling map (landmanager to lpjml names) from the
+        #   configuration
+        self.coupling_map = (
+            self.model.config.coupled_config.coupling_map.to_dict()
+        )
 
         # set the mapped variables from the farmers to the LPJmL input
         for attribute, lpjml_attribute in self.coupling_map.items():
@@ -62,14 +66,17 @@ class Farmer(core.Individual, base.Individual):
     def farmers(self):
         """Return the set of all farmers in the neighbourhood."""
         return [
-            farmer for farmer in cell.individuals if isinstance(farmer, self.__class__)
+            farmer
+            for farmer in self.cell.individuals
+            if isinstance(farmer, self.__class__)
         ]
 
     @property
     def cell_cropyield(self):
         """Return the average crop yield of the cell."""
         return np.sum(
-            self.cell.output.pft_harvestc.values * self.cell.output.cftfrac.values
+            self.cell.output.pft_harvestc.values
+            * self.cell.output.cftfrac.values
         )
 
     @property
@@ -77,7 +84,9 @@ class Farmer(core.Individual, base.Individual):
         """Return the average harvest date of the cell."""
         crop_idx = [
             i
-            for i, item in enumerate(self.cell.output.cftfrac.band.values.tolist())
+            for i, item in enumerate(
+                self.cell.output.cftfrac.band.values.tolist()
+            )
             if any(x in item for x in self.model.config.cftmap)
         ]
         if np.sum(self.cell.output.cftfrac.isel(band=crop_idx).values) == 0:

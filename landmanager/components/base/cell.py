@@ -26,7 +26,8 @@ class Cell(Entity):
         if num_rows == 0:
             return df  # Avoid unnecessary operations
 
-        # Efficient column additions using assignment (faster than DataFrame.insert)
+        # Efficient column additions using assignment
+        #   (faster than DataFrame.insert)
         df["cell"] = self.grid.cell.item()
         df["lon"] = self.grid.cell.lon.item()
         df["lat"] = self.grid.cell.lat.item()

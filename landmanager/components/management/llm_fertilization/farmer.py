@@ -31,13 +31,19 @@ class Farmer(management.Farmer):
         self.name = f"Farmer {self.cell.grid.cell.item()}"
         self.position = f"Lat: {self.cell.grid.lat.item()}, Lon: {self.cell.grid.lon.item()}"  # noqa
 
-        mask = xr.where(self.cell.output.cftfrac.isel(time=-1) > 0, True, False).drop(  # noqa
+        mask = xr.where(
+            self.cell.output.cftfrac.isel(time=-1) > 0, True, False
+        ).drop(  # noqa
             "time"
         )
         self.crops = (
-            self.cell.output.cftfrac.isel(time=[-1]).where(mask, drop=True).to_pandas()  # noqa
+            self.cell.output.cftfrac.isel(time=[-1])
+            .where(mask, drop=True)
+            .to_pandas()  # noqa
         )
-        self.mem_fert = self.cell.output.cft_nfert.where(mask, drop=True).to_pandas()  # noqa
+        self.mem_fert = self.cell.output.cft_nfert.where(
+            mask, drop=True
+        ).to_pandas()  # noqa
         self.mem_yield = self.cell.output.pft_harvestc.where(
             mask, drop=True
         ).to_pandas()
@@ -101,7 +107,7 @@ class Farmer(management.Farmer):
         (Ng/m2/year) to rainfed temperate cereals and irrigated biomass tree
         and no fertilizer to any other crop, your response will be:
         Reasoning: [Your reason to choose to apply less or more fertilizer]
-        Response: [['rainfed temperate cereals, 'irrigated biomass tree], [5, 8]]
+        Response: [['rainfed temperate cereals,'irrigated biomass tree],[5,8]]
         Make sure your response is in this format.
         Also do not use semi-colons ";".
         """
@@ -126,9 +132,9 @@ class Farmer(management.Farmer):
             )
 
         # set the new fertilizer values
-        self.cell.input.fertilizer_nr.isel(time=-1).loc[{"band": change_crops}] = (  # noqa
-            change_fertilizer
-        )
+        self.cell.input.fertilizer_nr.isel(time=-1).loc[
+            {"band": change_crops}
+        ] = change_fertilizer  # noqa
 
     def update(self, t):
         # call the base class update method

@@ -19,7 +19,9 @@ class Component:
 
         # get all cell outputs
         if hasattr(self.world, "cells"):
-            df = pd.concat([df] + [cell.output_table for cell in self.world.cells])
+            df = pd.concat(
+                [df] + [cell.output_table for cell in self.world.cells]
+            )
 
         # get all farmer outputs
         if hasattr(self.world, "farmers"):
