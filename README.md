@@ -1,6 +1,6 @@
 # landmanager
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14265856.svg)](https://doi.org/10.5281/zenodo.14265856) [![CI](https://github.com/pik-copan/landmanager/actions/workflows/check.yml/badge.svg)](https://github.com/pik-copan/landmanager/actions) [![codecov](https://codecov.io/gh/pik-copan/landmanager/graph/badge.svg?token=JU73NURPI0)](https://codecov.io/gh/pik-copan/landmanager)
+[![CI](https://github.com/jnnsbrr/landmanager/actions/workflows/check.yml/badge.svg)](https://github.com/jnnsbrr/landmanager/actions) [![codecov](https://codecov.io/gh/jnnsbrr/landmanager/graph/badge.svg?token=JU73NURPI0)](https://codecov.io/gh/jnnsbrr/landmanager)
 
 
 *Models build around LPJmL based on the [copan:LPJmL](https://github.com/pik-copan/pycopanlpjml) modeling framework*
@@ -48,7 +48,7 @@ See [scripts](./scripts/) for examples on how to use the model.
 
 ## Questions / Problems
 
-In case of questions please contact the author team or [open an issue](https://github.com/pik-copan/landmanager/issues/new).
+In case of questions please contact the author team or [open an issue](https://github.com/jnnsbrr/landmanager/issues/new).
 
 ## Contributing
 Merge requests are welcome, see [CONTRIBUTING.md](CONTRIBUTING.md). For major changes, please open an issue first to discuss what you would like to change.

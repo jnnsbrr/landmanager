@@ -2,15 +2,17 @@ cff-version: 1.2.0
 message: If you use this software, please cite it using the metadata from this file.
 type: software
 title: 'models build around LPJmL based on the copan:LPJmL modeling framework'
-version: 0.1.1
-date-released: '2025-01-03'
+version: 0.1.2
+date-released: '2025-02-27'
 abstract: x
 authors:
 - family-names: Breier
   given-names: Jannes
   email: jannesbr@pik-potsdam.de
   orcid: 0000-0002-9055-6904
-
+- family-names: Prawitz
+  given-names: Hannah
+  orcid: 0009-0001-7381-887X
 
 license: AGPL-3.0
 repository-code: https://github.com/jannesbr/landmanager

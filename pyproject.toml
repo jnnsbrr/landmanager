@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "landmanager"
-version = "0.1.1"
+version = "0.1.2"
 description = "Models build around LPJmL based on the copan:LPJmL modeling framework"
 readme = "README.md"
 license = {file = "LICENSE.md"}
@@ -32,8 +32,8 @@ dependencies = [
     "xarray>=0.21.1",
     "ruamel.yaml>=0.17.16",
     "pyarrow>17.0.0",
-    "dotenv>=0.19.0",
-    "openai>=0.2.0",
+    "dotenv",
+    "openai",
     "pycopancore @ git+https://github.com/PIK-copan/pycopancore.git",
     "pycoupler @ git+https://github.com/PIK-LPJmL/pycoupler.git",
     "pycopanlpjml @ git+https://github.com/PIK-copan/pycopanlpjml.git"
