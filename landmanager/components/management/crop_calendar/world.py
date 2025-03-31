@@ -1207,9 +1207,9 @@ def calc_doy_wet_month(daily_ppet):
     kernel = np.ones(window_size)
 
     # Perform convolution with periodic wrapping
-    extended_values = np.hstack([daily_values, daily_values[:, : window_size - 1]])
+    extended_values = np.hstack([daily_values, daily_values[:, : window_size - 1]])  # noqa
     running_sum = np.apply_along_axis(
-        lambda x: np.convolve(x, kernel, mode="valid"), axis=1, arr=extended_values
+        lambda x: np.convolve(x, kernel, mode="valid"), axis=1, arr=extended_values  # noqa
     )
 
     # Trim the running sum to match the original data length (365 days)
