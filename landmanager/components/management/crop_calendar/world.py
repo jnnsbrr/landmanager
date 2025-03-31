@@ -1198,10 +1198,23 @@ def calc_doy_wet_month(daily_ppet):
         wettest 120-day period.
     :rtype: int
     """
-    doys = np.arange(1, 366)
+    daily_values = np.asarray(daily_ppet["value"])  # Extract daily values
 
-    x = np.array(
-        [np.sum(daily_ppet["value"][i : i + 120]) for i in range(365 - 120 + 1)]  # noqa
-    )
+    n_days = daily_values.shape[1]  # Number of days in a year (e.g., 365)
+    window_size = 120  # Length of the rolling window
 
-    return doys[np.argmax(x)]
+    # Precompute the kernel for convolution
+    kernel = np.ones(window_size)
+
+    # Perform convolution with modular arithmetic for periodic behavior
+    running_sum = np.zeros_like(daily_values)
+    for i in range(n_days):
+        # Compute the sum over the window [i:i+window_size], wrapping around
+        indices = (np.arange(i, i + window_size) % n_days)  # Wrap indices
+        running_sum[:, i] = daily_values[:, indices].sum(axis=1)
+
+    # Find the index of the maximum running sum for each cell
+    start_day_indices = np.argmax(running_sum, axis=1)
+
+    # Convert indices to DOY (Day of Year)
+    return start_day_indices + 1
