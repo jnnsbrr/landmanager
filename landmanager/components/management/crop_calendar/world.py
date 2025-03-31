@@ -1206,15 +1206,14 @@ def calc_doy_wet_month(daily_ppet):
     # Precompute the kernel for convolution
     kernel = np.ones(window_size)
 
-    # Perform convolution with modular arithmetic for periodic behavior
-    running_sum = np.zeros_like(daily_values)
-    for i in range(n_days):
-        # Compute the sum over the window [i:i+window_size], wrapping around
-        indices = (np.arange(i, i + window_size) % n_days)  # Wrap indices
-        running_sum[:, i] = daily_values[:, indices].sum(axis=1)
+    # Perform convolution with periodic wrapping
+    extended_values = np.hstack([daily_values, daily_values[:, :window_size - 1]])
+    running_sum = np.apply_along_axis(
+        lambda x: np.convolve(x, kernel, mode="valid"), axis=1, arr=extended_values
+    )
 
-    # Find the index of the maximum running sum for each cell
-    start_day_indices = np.argmax(running_sum, axis=1)
+    # Trim the running sum to match the original data length (365 days)
+    running_sum = running_sum[:, :n_days]
 
     # Convert indices to DOY (Day of Year)
-    return start_day_indices + 1
+    return np.argmax(running_sum, axis=1) + 1
