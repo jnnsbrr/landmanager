@@ -4,12 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "landmanager"
-version = "0.1.2"
+version = "0.1.3"
 description = "Models build around LPJmL based on the copan:LPJmL modeling framework"
 readme = "README.md"
 license = {file = "LICENSE.md"}
 authors = [
-    { name = "Jannes Breier", email = "jannes.breier@pik-potsdam.de" }
+    { name = "Jannes Breier", email = "jannes.breier@pik-potsdam.de" },
+    { name = "Stephen B. Wirth", email = "stephen.wirth@pik-potsdam.de" }
 ]
 requires-python = ">=3.9"
 keywords = ["DGVM", "ABM", "LPJmL", "copan:CORE"]
