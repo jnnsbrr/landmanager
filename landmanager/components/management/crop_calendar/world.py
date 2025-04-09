@@ -132,10 +132,10 @@ class WorldCrop(WorldActivity):
         """
         Update crop-specific parameters based on winter crop classification.
 
-        :param is_winter_crop: Boolean array indicating winter crop classification.
+        :param is_winter_crop: Boolean array indicating winter crop classification.  # noqa
         :type is_winter_crop: xr.DataArray
         """
-        # Extract relevant parameters based on crop name and winter crop classification
+        # Extract relevant parameters based on crop name and winter crop classification  # noqa
         param_filter = (self.world.crops.parameters["cft_name"] == self.name) & (  # noqa
             self.world.crops.parameters["winter_crop"] == 0
         )
@@ -158,7 +158,7 @@ class WorldCrop(WorldActivity):
             # Apply winter crop parameters where applicable
             if not winter_param.empty:
                 self[param] = self[param].where(
-                    ~is_winter_crop,  # Use spring parameters if not winter crop
+                    ~is_winter_crop,  # Use spring parameters if not winter crop  # noqa
                     winter_param[param].values,
                 )
 
@@ -949,7 +949,7 @@ class WorldCropSet(WorldActivity):
         # Calculate crop calendar for each crop
         for crop in self.calendars:
 
-            # Update crop-specific parameters based on winter crop classification
+            # Update crop-specific parameters based on winter crop classification  # noqa
             is_winter_crop = self[crop].is_winter_crop
             self[crop].update_parameters(is_winter_crop)
 
