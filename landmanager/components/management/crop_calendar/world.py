@@ -129,38 +129,38 @@ class WorldCrop(WorldActivity):
         self.update_parameters(is_winter_crop=self.is_winter_crop)
 
     def update_parameters(self, is_winter_crop):
-      """
-      Update crop-specific parameters based on winter crop classification.
+        """
+        Update crop-specific parameters based on winter crop classification.
 
-      :param is_winter_crop: Boolean array indicating winter crop classification.
-      :type is_winter_crop: xr.DataArray
-      """
-      # Extract relevant parameters based on crop name and winter crop classification
-      param_filter = (self.world.crops.parameters["cft_name"] == self.name) & (
-          self.world.crops.parameters["winter_crop"] == 0
-      )
-      winter_param = self.world.crops.parameters[
-          (self.world.crops.parameters["cft_name"] == self.name)
-          & (self.world.crops.parameters["winter_crop"] == 1)
-      ]
+        :param is_winter_crop: Boolean array indicating winter crop classification.
+        :type is_winter_crop: xr.DataArray
+        """
+        # Extract relevant parameters based on crop name and winter crop classification
+        param_filter = (self.world.crops.parameters["cft_name"] == self.name) & (
+            self.world.crops.parameters["winter_crop"] == 0
+        )
+        winter_param = self.world.crops.parameters[
+            (self.world.crops.parameters["cft_name"] == self.name)
+            & (self.world.crops.parameters["winter_crop"] == 1)
+        ]
 
-      ncell = len(self.world.grid.cell)
+        ncell = len(self.world.grid.cell)
 
-      # Update each parameter dynamically
-      for param, val in self.world.crops.parameters[param_filter].items():
-          # Create or update the parameter as an xarray DataArray
-          self[param] = xr.DataArray(
-              np.repeat(val, ncell),
-              dims=["cell"],
-              coords={"cell": self.world.grid.cell.values},
-              name=param,
-          )
-          # Apply winter crop parameters where applicable
-          if not winter_param.empty:
-              self[param] = self[param].where(
-                  ~is_winter_crop,  # Use spring parameters if not winter crop
-                  winter_param[param].values,
-              )
+        # Update each parameter dynamically
+        for param, val in self.world.crops.parameters[param_filter].items():
+            # Create or update the parameter as an xarray DataArray
+            self[param] = xr.DataArray(
+                np.repeat(val, ncell),
+                dims=["cell"],
+                coords={"cell": self.world.grid.cell.values},
+                name=param,
+            )
+            # Apply winter crop parameters where applicable
+            if not winter_param.empty:
+                self[param] = self[param].where(
+                    ~is_winter_crop,  # Use spring parameters if not winter crop
+                    winter_param[param].values,
+                )
 
     @property
     def is_winter_crop(self, temperate_cereals_only=True):
