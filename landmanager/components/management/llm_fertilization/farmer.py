@@ -76,37 +76,59 @@ class Farmer(management.Farmer):
 
     def decide_fertilizer(self):
         question_prompt = f"""
-        You are a representative farmer of a whole simulation cell of 0.5x0.5°
-        at {self.position} (cell centre).
-        On your farm, you have the following crops (crop functional types) with
-        the corresponding fraction of your land occupied by those crops:
-        {self.crops}.
-        Now, you are deciding on how much fertilizer you want to apply for each
-        crop.
-        Your task is to increase the crop yield by increasing the application
-        of N fertilizer as long as it is reasonable. Also take into
-        account the local conditions as well as available literature
-        estimates for the optimal amount of fertilizer that should be applied
-        to the crop.
-        This also means that if higher fertilization does not increase the
-        crop yield as before, you stop or even reduce the amount again.
-        Here is the amount of fertilizer applied in the last years in
-        Ng/m2/year: {self.mem_fert}.
-        And here is the corresponding yield per crop from the last 10 years in
-        gC/m2/year: {self.mem_yield}.
-        Based on this context, you need to estimate the amount of fertilizer
-        per crop in Ng/m2/year for the upcoming year.
-        You must provide your reasoning (max 200 characters) for your choice
-        and then your response by providing the amount of fertilizer you want
-        to apply to each crop type.
-        For example, if you would apply fertilizer amounts of 5 and 8
-        (Ng/m2/year) to rainfed temperate cereals and irrigated biomass tree
-        and no fertilizer to any other crop, your response will be:
-        Reasoning: [Your reason to choose to apply less or more fertilizer]
-        Response: [['rainfed temperate cereals,'irrigated biomass tree],[5,8]]
-        Make sure your response is in this format.
-        Also do not use semi-colons ";".
+        You are a representative farmer for the 0.5°x0.5° simulation cell
+        centered at {self.position}.
+
+        You manage the following crop types on your land (with land fractions):
+        {self.crops}
+
+        Your goal: **maximize crop yield** by adjusting nitrogen (N) fertilizer
+        application per crop (in gN/m²/year).
+
+        Consider the following historical data as your memory (last 9 years):
+        - Fertilizer application: {self.mem_fert}
+        - Crop yields (in gC/m²/year): {self.mem_yield}
+
+        Apply the following rules:
+        1. Any crop currently fertilized with **less than 5 gN/m²/year** is
+        likely underfertilized. **Increase to crop-specific levels seen in
+        intensive agriculture (~10–30 gN/m²/year)**
+        2. You have been responsible for fertilizer decisions over the last
+        10 years. Your memory covers the past 9 years of data. This year
+        completes the full 10-year span. All rules defined here apply over this
+        period.
+        3. Yield responses may take time. **Maintain or steadily increase**
+        fertilizer for 3–5 years to observe long-term effects.
+        4. If yields have not clearly saturated (based on memory), continue
+        **increasing fertilizer by 3–5 gN/m²/year** to explore the response.
+        5. **Never apply more than 3 gN/m²/year to nitrogen-fixing crops**
+        (e.g., pulses, soybean). This is a hard upper limit. Excess N reduces
+        their yield.
+        6. Only **reduce fertilizer** if there is a clear and consistent
+        **negative yield trend over the past 3–5 years**. This is only relevant
+        for nitrogen-fixing crops.
+
+        Your task:
+        Estimate the fertilizer amount (gN/m²/year) for each crop for the
+        coming year, following all rules equally.
+
+        ### Format your response exactly like this:
+        Reasoning: [Max 200 characters]
+        Response: [['crop1','crop2'], [amount1, amount2]]
+
+        Example:
+        Reasoning: Increased temperate cereal N due to low yield response,
+        kept others constant.
+        Response: [['rainfed temperate cereals','irrigated biomass tree'], [5, 8]]
+
+        Technical Note:
+        - Use **only** the format above.
+        - Ensure that crop names and amounts match and that both lists are the
+        same length.
+        - Do **not** use semicolons ";" in your response.
         """
+
+
         messages = [{"role": "system", "content": question_prompt}]
         try:
             output = self.get_response(messages)
