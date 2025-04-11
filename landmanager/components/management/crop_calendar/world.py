@@ -877,7 +877,7 @@ class WorldCrop(WorldActivity):
         # Use np.arange for efficient indexing
         for i in range(ncell):
             veff_shifted[i, : end_indices[i] - start_indices[i]] = veff_full[
-                i, start_indices[i]: end_indices[i]
+                i, start_indices[i] : end_indices[i]
             ]
 
         # End day of vernalization when vdsum >= vd
