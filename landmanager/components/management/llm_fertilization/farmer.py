@@ -33,6 +33,15 @@ class Farmer(management.Farmer):
             f"Lat: {self.cell.grid.lat.item()}, Lon: {self.cell.grid.lon.item()}"  # noqa
         )
 
+        # init crops
+        self.crops = None
+        # init fertilizer and yield memory
+        self.mem_fert = None
+        self.mem_yield = None
+        # init llm responses
+        self.reasoning = None
+
+    def update_memory(self):
         mask = xr.where(self.cell.output.cftfrac.isel(time=-1) > 0, True, False).drop(  # noqa
             "time"
         )  # noqa
@@ -43,9 +52,6 @@ class Farmer(management.Farmer):
         self.mem_yield = self.cell.output.pft_harvestc.where(
             mask, drop=True
         ).to_pandas()  # noqa
-
-        # init llm responses
-        self.reasoning = None
 
     def get_response(self, messages):
         """Get response from llm"""
@@ -92,21 +98,24 @@ class Farmer(management.Farmer):
         Apply the following rules:
         1. Any crop currently fertilized with **less than 5 gN/m²/year** is
         likely underfertilized. **Increase to crop-specific levels seen in
-        intensive agriculture (~10–30 gN/m²/year)**
+        intensive agriculture (~20–30 gN/m²/year)**
         2. You have been responsible for fertilizer decisions over the last
         10 years. Your memory covers the past 9 years of data. This year
-        completes the full 10-year span. All rules defined here apply over this
-        period.
-        3. Yield responses may take time. **Maintain or steadily increase**
-        fertilizer for 3–5 years to observe long-term effects.
+        completes the full 10-year span. All rules defined here apply along
+        this period.
+        3. Yield responses are often underlay interferences due to fluctuations
+        of other factors like weather. **Maintain or steadily increase**
+        fertilizer for at least 2–3 years to observe the effects.
         4. If yields have not clearly saturated (based on memory), continue
-        **increasing fertilizer by 3–5 gN/m²/year** to explore the response.
-        5. **Never apply more than 3 gN/m²/year to nitrogen-fixing crops**
-        (e.g., pulses, soybean). This is a hard upper limit. Excess N reduces
-        their yield.
+        **increasing fertilizer by 3–5 gN/m²/year** until saturation (more
+        fertilizer do not lead to higher yields). Then keep fertilizer
+        constant.
+        5. **Do not increase fertilization for nitrogen-fixing crops**
+        (e.g., pulses, soybean). Excess fertilizer may lead to negative yield
+        responses.
         6. Only **reduce fertilizer** if there is a clear and consistent
-        **negative yield trend over the past 3–5 years**. This is only relevant
-        for nitrogen-fixing crops.
+        **negative yield trend over the past 3-5 years**. This is mostly only
+        relevant for nitrogen-fixing crops.
 
         Your task:
         Estimate the fertilizer amount (gN/m²/year) for each crop for the
@@ -127,7 +136,6 @@ class Farmer(management.Farmer):
         same length.
         - Do **not** use semicolons ";" in your response.
         """
-
 
         messages = [{"role": "system", "content": question_prompt}]
         try:
@@ -155,4 +163,5 @@ class Farmer(management.Farmer):
     def update(self, t):
         # call the base class update method
         super().update(t)
+        self.update_memory()
         self.decide_fertilizer()

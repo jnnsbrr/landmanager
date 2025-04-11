@@ -184,18 +184,22 @@ class WorldCrop(WorldActivity):
         band = f"rainfed {self.name}"
 
         # Get the last sowing and harvest dates for all cells
-        sdate = world_output.sdate.sel(band=band).isel(time=-1)
-        hdate = world_output.hdate.sel(band=band).isel(time=-1)
+        # sdate = world_output.sdate.sel(band=band).isel(time=-1)
+        # hdate = world_output.hdate.sel(band=band).isel(time=-1)
+
+        sdate = world_output.sdate.mean(dim=["time"]).sel(band=band)
+        hdate = world_output.hdate.mean(dim=["time"]).sel(band=band)
 
         # Mask invalid sowing dates
         valid_sdate = sdate >= 0
 
         # Get the latitude of each cell and the lowest temperature
         lat = self.world.grid.lat
-        lowest_temp = world_output.temp.min(dim=["time", "band"])
+
+        lowest_temp = world_output.temp.mean(dim=["time"]).min(dim=["band"])
 
         # Calculate the growing period
-        grow_period = xr.where(sdate <= hdate, hdate - sdate, 365 + hdate - sdate)  # noqa
+        grow_period = xr.where(sdate <= hdate, hdate - sdate, 365 + hdate - sdate)
 
         # Conditions for winter crop classification based on latitude and
         #   temperature
@@ -742,28 +746,24 @@ class WorldCrop(WorldActivity):
         # Assign the results to self attributes
         return (hdate_rf, hdate_ir, hreason_rf, hreason_ir)
 
-    def calc_phu(self, daily_temp, sdate, hdate, vern_factor=None, phen_model="t"):  # noqa
+    def calc_phu(self, monthly_climate, sdate, hdate):  # noqa
         """
         Calculate PHU requirements.
 
-        :param daily_temp: Dict of two arrays of interpolated monthly to daily
-            temperatures.
-        :type daily_temp: dict
+        :param monthly_climate: Dict of arrays of monthly climate variables
+            (shape: (21, 12)).
+        :type monthly_climate: dict
         :param sdate: Sowing date (DOY).
         :type sdate: xr.DataArray of type int
         :param hdate: Maturity date (DOY).
         :type hdate: xr.DataArray of type int
-        :param vern_factor: Vernalization factor from calcVf(), length should
-            be 365.
-        :type vern_factor: list or numpy.ndarray
-        :param phen_model: Phenological model, one of "t", "tv", "tp", "tvp".
-        :type phen_model: str
         :return: Total Thermal Unit Requirements.
         :rtype: int
         """
 
+        daily_temp = monthly_climate["daily_temp"]
         # Adjust hdate for cross-year growth
-        hdate = np.where(sdate < hdate, hdate, hdate + 365)
+        hdate = hdate.where(sdate < hdate, hdate + 365)
 
         husum = xr.full_like(sdate, 0, dtype=int)
 
@@ -779,32 +779,138 @@ class WorldCrop(WorldActivity):
         )
 
         grow_mask = (day_values.values >= sdate.values[:, None]) & (
-            day_values.values < hdate[:, None]
+            day_values.values < hdate.values[:, None]
         )
-        # Compute Effective Thermal Units (teff) using vectorized operations
-        if phen_model == "t":
-            teff = np.maximum(temp_values - self.basetemp_low, 0) * grow_mask
-        elif phen_model == "tv" and vern_factor is not None:
-            teff = (
-                np.maximum(temp_values - self.basetemp_low, 0)
-                * np.array(vern_factor)
-                * grow_mask
-            )
-        elif phen_model == "tv" and vern_factor is None:
-            raise ValueError("Error: vern_factor not provided!")
+
+        if any(self.winter_crop):
+            vern_factor = self.calc_vrf(sdate, hdate, monthly_climate)
+            vern_factor = vern_factor.where(self.winter_crop, 1)
         else:
-            raise ValueError("Error: phen_model not declared!")
+            vern_factor = 1
+
+        # Compute Effective Thermal Units (teff) using vectorized operations
+        teff = np.maximum(temp_values - self.basetemp_low, 0) * grow_mask * vern_factor
 
         # Compute total PHU requirement efficiently
         husum.values = np.sum(teff, axis=1).astype(int)
 
-        # Negate if using "tv" model
-        if phen_model == "tv":
-            husum *= -1
-        else:
-            husum = husum.where(self.winter_crop == 0, -husum)
+        husum = husum.where(self.winter_crop == 0, -husum)
 
         return husum
+
+    def calc_vrf(
+        self,
+        sdate,
+        hdate,
+        monthly_climate,
+        vd_b=0.2,
+        max_vern_months=5,
+    ):  # noqa
+        """
+        Calculate the Vernalization Reduction Factor (VRF) for each day using
+        vectorized logic.
+        """
+
+        daily_temp = monthly_climate["daily_temp"]["value"]  # (cell, 365)
+        ncell = daily_temp.shape[0]
+
+        # --- Vernalization Effectiveness ---
+        veff = np.select(
+            [
+                (self.vern_temp_min <= daily_temp)
+                & (daily_temp < self.vern_temp_opt_min),  # noqa
+                (self.vern_temp_opt_min <= daily_temp)
+                & (daily_temp <= self.vern_temp_opt_max),
+                (self.vern_temp_opt_max < daily_temp)
+                & (daily_temp < self.vern_temp_max),  # noqa
+            ],
+            [
+                (daily_temp - self.vern_temp_min)
+                / (self.vern_temp_opt_min - self.vern_temp_min),
+                1.0,
+                (self.vern_temp_max - daily_temp)
+                / (self.vern_temp_max - self.vern_temp_opt_max),
+            ],
+            default=0.0,
+        )
+        veff = np.clip(veff, 0, 1)
+
+        # Repeat veff to 730 days (optimized memory usage)
+        veff_full = np.repeat(veff, 2, axis=1)  # (cell, 730)
+
+        # --- Calculate vd (vernalization requirement in days) ---
+        monthly_temp = monthly_climate["temp"]  # (cell, 12)
+        coldest_months_idx = np.argsort(monthly_temp, axis=1)[:, :max_vern_months]  # noqa
+        max_days_per_month = self.max_vern_days / max_vern_months
+
+        month_temp = monthly_temp.values[np.arange(ncell)[:, None], coldest_months_idx]  # noqa
+
+        temp_min = self.vern_temp_opt_min.values[:, np.newaxis]  # (ncell, 1)
+        temp_max = self.vern_temp_opt_max.values[:, np.newaxis]  # (ncell, 1)
+
+        # Vectorized month-based calculations
+        days = np.where(
+            (month_temp <= temp_min),
+            max_days_per_month.values[:, np.newaxis],
+            np.where(
+                month_temp >= temp_max,
+                0.0,
+                max_days_per_month.values[:, np.newaxis]
+                * (1 - (month_temp - temp_min) / (temp_max - temp_min)),
+            ),
+        )
+
+        vd = np.round(np.sum(days, axis=1)).astype(int)  # (cell,)
+
+        # --- Determine end of vernalization window ---
+        hdate_ext = np.where(sdate < hdate, hdate, hdate + 365)
+
+        # Track cumulative veff per cell starting from sdate
+        veff_shifted = np.full((ncell, 730), 0.0)
+
+        start_end_diff = (hdate_ext - sdate.values).astype(int)
+
+        # Optimized slicing of veff_shifted without loop
+        start_indices = sdate.values
+        end_indices = start_indices + start_end_diff
+
+        # Use np.arange for efficient indexing
+        for i in range(ncell):
+            veff_shifted[i, : end_indices[i] - start_indices[i]] = veff_full[
+                i, start_indices[i] : end_indices[i]
+            ]
+
+        # End day of vernalization when vdsum >= vd
+        no_vern_needed = vd == 0
+
+        # --- Compute VRF with vectorized cumsum and masking ---
+        vrf = np.ones((ncell, 365), dtype=float)
+
+        # Directly assign veff to vrf_veff (no need for a loop)
+        vrf_veff = np.full((ncell, 365), 0.0)
+        for i in range(ncell):
+            start = sdate.values[i]
+            end = start + start_end_diff[i]
+            vrf_veff[i, : end - start] = veff_full[i, start:end]
+
+        vrf_cumsum = np.cumsum(vrf_veff, axis=1)  # (cell, 365)
+
+        vmin = vd * vd_b
+        with np.errstate(divide="ignore", invalid="ignore"):
+            vrf_tmp = (vrf_cumsum.T - vmin).T / (vd - vmin)[:, None]
+            vrf_tmp = np.clip(vrf_tmp, 0.0, 1.0)
+            vrf = np.where(vrf_cumsum < vmin[:, None], 0.0, vrf_tmp)
+
+        # Cells with no vernalization required
+        vrf[no_vern_needed, :] = 1.0
+
+        # --- Return as xarray ---
+        return xr.DataArray(
+            np.repeat(vrf, 2, axis=1),  # Repeat for 730 days
+            dims=("cell", "day"),
+            coords={"cell": sdate.cell, "day": np.arange(1, 731)},
+            name="vrf",
+        )
 
 
 class WorldCropSet(WorldActivity):
@@ -1011,14 +1117,14 @@ class WorldCropSet(WorldActivity):
             )
 
             crop_phu_rf = self[crop].calc_phu(
-                daily_temp=monthly_climate["daily_temp"],
+                monthly_climate=monthly_climate,
                 sdate=crop_sdate,
                 hdate=crop_hdate_rf,
             )
             self.world.calendar.crop_phu.loc[{"band": f"rainfed {crop}"}] = crop_phu_rf  # noqa
 
             crop_phu_ir = self[crop].calc_phu(
-                daily_temp=monthly_climate["daily_temp"],
+                monthly_climate=monthly_climate,
                 sdate=crop_sdate,
                 hdate=crop_hdate_ir,
             )
