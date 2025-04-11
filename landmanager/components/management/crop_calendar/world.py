@@ -199,7 +199,7 @@ class WorldCrop(WorldActivity):
         lowest_temp = world_output.temp.mean(dim=["time"]).min(dim=["band"])
 
         # Calculate the growing period
-        grow_period = xr.where(sdate <= hdate, hdate - sdate, 365 + hdate - sdate)
+        grow_period = xr.where(sdate <= hdate, hdate - sdate, 365 + hdate - sdate)  # noqa
 
         # Conditions for winter crop classification based on latitude and
         #   temperature
@@ -789,7 +789,7 @@ class WorldCrop(WorldActivity):
             vern_factor = 1
 
         # Compute Effective Thermal Units (teff) using vectorized operations
-        teff = np.maximum(temp_values - self.basetemp_low, 0) * grow_mask * vern_factor
+        teff = np.maximum(temp_values - self.basetemp_low, 0) * grow_mask * vern_factor  # noqa
 
         # Compute total PHU requirement efficiently
         husum.values = np.sum(teff, axis=1).astype(int)
@@ -877,7 +877,7 @@ class WorldCrop(WorldActivity):
         # Use np.arange for efficient indexing
         for i in range(ncell):
             veff_shifted[i, : end_indices[i] - start_indices[i]] = veff_full[
-                i, start_indices[i] : end_indices[i]
+                i, start_indices[i]: end_indices[i]
             ]
 
         # End day of vernalization when vdsum >= vd

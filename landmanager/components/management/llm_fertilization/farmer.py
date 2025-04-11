@@ -128,7 +128,8 @@ class Farmer(management.Farmer):
         Example:
         Reasoning: Increased temperate cereal N due to low yield response,
         kept others constant.
-        Response: [['rainfed temperate cereals','irrigated biomass tree'], [5, 8]]
+        Response:
+        [['rainfed temperate cereals','irrigated biomass tree'], [5, 8]]
 
         Technical Note:
         - Use **only** the format above.
