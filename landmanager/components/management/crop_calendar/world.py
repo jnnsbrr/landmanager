@@ -594,7 +594,7 @@ class WorldCrop(WorldActivity):
 
         # Precompute max temperature once
         max_temp = monthly_climate["max_temp"]
-        hdate_rf  = xr.full_like(self.world.grid.cell, 0, dtype=int)
+        hdate_rf = xr.full_like(self.world.grid.cell, 0, dtype=int)
         hdate_ir = xr.full_like(self.world.grid.cell, 0, dtype=int)
         hreason_rf = xr.full_like(self.world.grid.cell, "", dtype="<U20")  # noqa
         hreason_ir = xr.full_like(self.world.grid.cell, "", dtype="<U20")  # noqa
