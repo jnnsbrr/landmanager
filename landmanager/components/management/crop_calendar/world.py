@@ -680,7 +680,7 @@ class WorldCrop(WorldActivity):
                 hdate_first,
                 np.where(
                     (smonth == 0) & (max_temp < self.temp_fall),
-                    hdate_temp_opt,
+                    hdate_first,
                     np.minimum(np.maximum(hdate_first, hdate_temp_base), hdate_last),  # noqa
                 ),
                 np.minimum(np.maximum(hdate_first, hdate_temp_opt), hdate_last),  # noqa
