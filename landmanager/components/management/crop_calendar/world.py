@@ -594,8 +594,10 @@ class WorldCrop(WorldActivity):
 
         # Precompute max temperature once
         max_temp = monthly_climate["max_temp"]
-        hdate_rf = hdate_ir = xr.full_like(self.world.grid.cell, 0, dtype=int)
-        hreason_rf = hreason_ir = xr.full_like(self.world.grid.cell, "", dtype="<U20")  # noqa
+        hdate_rf = xr.full_like(self.world.grid.cell, 0, dtype=int)
+        hdate_ir = xr.full_like(self.world.grid.cell, 0, dtype=int)
+        hreason_rf = xr.full_like(self.world.grid.cell, "", dtype="<U20")  # noqa
+        hreason_ir = xr.full_like(self.world.grid.cell, "", dtype="<U20")  # noqa
 
         hdate_rf.values = np.select(
             [
@@ -623,7 +625,7 @@ class WorldCrop(WorldActivity):
                 hdate_first,
                 np.where(
                     (smonth == 0) & (max_temp < self.temp_fall),
-                    hdate_temp_opt,
+                    hdate_first,
                     np.minimum(np.maximum(hdate_first, hdate_temp_base), hdate_last),  # noqa
                 ),
                 np.minimum(np.maximum(hdate_first, hdate_temp_opt), hdate_last),  # noqa
@@ -678,7 +680,7 @@ class WorldCrop(WorldActivity):
                 hdate_first,
                 np.where(
                     (smonth == 0) & (max_temp < self.temp_fall),
-                    hdate_temp_opt,
+                    hdate_first,
                     np.minimum(np.maximum(hdate_first, hdate_temp_base), hdate_last),  # noqa
                 ),
                 np.minimum(np.maximum(hdate_first, hdate_temp_opt), hdate_last),  # noqa
