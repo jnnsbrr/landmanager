@@ -88,38 +88,21 @@ class Farmer(management.Farmer):
         You manage the following crop types on your land (with land fractions):
         {self.crops}
 
-        Your goal: **maximize crop yield** by adjusting nitrogen (N) fertilizer
-        application per crop (in gN/m²/year).
+        **Your number one goal is to maximize crop yields as quickly as
+        possible to levels of western intensive agriculture and beyond by
+        ensuring optimal, crop-specific fertilization. Also at the same time do
+        not waste fertilizer.**
 
-        Consider the following historical data as your memory (last 9 years):
+        Consider the following historical data as your memory from the past 9 years:
         - Fertilizer application: {self.mem_fert}
         - Crop yields (in gC/m²/year): {self.mem_yield}
 
-        Apply the following rules:
-        1. Any crop currently fertilized with **less than 5 gN/m²/year** is
-        likely underfertilized. **Increase to crop-specific levels seen in
-        intensive agriculture (~20–30 gN/m²/year)**
-        2. You have been responsible for fertilizer decisions over the last
-        10 years. Your memory covers the past 9 years of data. This year
-        completes the full 10-year span. All rules defined here apply along
-        this period.
-        3. Yield responses are often underlay interferences due to fluctuations
-        of other factors like weather. **Maintain or steadily increase**
-        fertilizer for at least 2–3 years to observe the effects.
-        4. If yields have not clearly saturated (based on memory), continue
-        **increasing fertilizer by 3–5 gN/m²/year** until saturation (more
-        fertilizer do not lead to higher yields). Then keep fertilizer
-        constant.
-        5. **Do not increase fertilization for nitrogen-fixing crops**
-        (e.g., pulses, soybean). Excess fertilizer may lead to negative yield
-        responses.
-        6. Only **reduce fertilizer** if there is a clear and consistent
-        **negative yield trend over the past 3-5 years**. This is mostly only
-        relevant for nitrogen-fixing crops.
+        Note: Some crops (e.g. pulses, soybeans) naturally fix nitrogen and
+        generally require little external N. Too much N can reduce their yields.
 
         Your task:
-        Estimate the fertilizer amount (gN/m²/year) for each crop for the
-        coming year, following all rules equally.
+        Based on this goal you decide how much N fertilizer amount (gN/m²/year)
+        you apply for each crop for the coming year.
 
         ### Format your response exactly like this:
         Reasoning: [Max 200 characters]
@@ -133,10 +116,37 @@ class Farmer(management.Farmer):
 
         Technical Note:
         - Use **only** the format above.
-        - Ensure that crop names and amounts match and that both lists are the
-        same length.
+        - **Ensure exactly that crop names and amounts match and that both lists
+        are the same length.**
         - Do **not** use semicolons ";" in your response.
         """
+
+        # Your goal: **maximize crop yield** by adjusting nitrogen (N) fertilizer
+        # application per crop (in gN/m²/year).
+
+        # Based on this knowlege and rules you decide how much N fertilizer amount (gN/m²/year)
+        # you apply for each crop for the coming year following all rules equally.
+
+        # Apply the following rules:
+        # 1. Any crop currently fertilized with **less than 5 gN/m²/year** is
+        # likely underfertilized. **Increase to crop-specific levels seen in
+        # intensive agriculture (~20–30 gN/m²/year)**
+        # 2. You have been responsible for fertilizer decisions over the last
+        # 10 years. Your memory covers the past 9 years of data. This year
+        # completes the full 10-year span. All rules defined here apply along
+        # this period.
+        # 3. Yield responses are often underlay interferences due to fluctuations
+        # of other factors like weather. **Maintain or steadily increase**
+        # fertilizer for at least 2–3 years to observe the effects.
+        # 4. If yields have not clearly saturated (more fertilizer do not
+        # increase yields anymore), continue **increasing fertilizer by max
+        # 3–5 gN/m²/year** until saturation.
+        # 5. **Do not increase fertilization for nitrogen-fixing crops**
+        # (e.g., pulses, soybean).
+        # 6. Only reduce fertilizer if there is a clear and consistent
+        # negative yield trend caused by fertilization over the past
+        # 5 years.
+
 
         messages = [{"role": "system", "content": question_prompt}]
         try:

@@ -29,9 +29,24 @@ class Cell(crop_calendar.Cell):
             "harvest reason of calendar crops",
             unit=None,
         ),
+        hrule=Variable(
+            "harvest rule",
+            "harvest rule of calendar crops",
+            unit=None,
+        ),
         crop_phu=Variable(
             "crop phenological unit",
             "crop phenological unit",
+            unit=None,
+        ),
+        temp=Variable(
+            "temperature",
+            "average annual temperature",
+            unit=None,
+        ),
+        prec=Variable(
+            "precipitation",
+            "annual precipitation",
             unit=None,
         ),
     )
@@ -72,15 +87,19 @@ class Model(lpjml.Component, management.Component):
         )
         # initialize cells
         self.init_cells(model=self, cell_class=Cell, world_views=["calendar"])
-        self.write_output_table(
-            file_format=self.config.coupled_config.output_settings.file_format,
-            init=True,
-        )
+        # self.write_output_table(
+        #     file_format=self.config.coupled_config.output_settings.file_format,
+        #     init=True,
+        # )
 
     def update(self, t):
         super().update(t)
+        if self.config.start_coupling == t:
+            init_table = True
+        else:
+            init_table = False
         self.write_output_table(
             file_format=self.config.coupled_config.output_settings.file_format,
-            init=False,
+            init=init_table,
         )
         self.update_lpjml(t)
