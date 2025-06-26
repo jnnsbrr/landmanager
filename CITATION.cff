@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: If you use this software, please cite it using the metadata from this file.
 type: software
 title: 'models build around LPJmL based on the copan:LPJmL modeling framework'
-version: 0.1.4
+version: 0.1.5
 date-released: '2025-04-11'
 abstract: x
 authors:
