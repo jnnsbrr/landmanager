@@ -8,14 +8,10 @@
 # URL: <http://www.pik-potsdam.de/copan/software>
 # Contact: core@pik-potsdam.de
 # License: BSD 2-clause license
-import numpy as np
 import time
 import ast
-import pandas as pd
 import xarray as xr
 
-import pycopancore.model_components.base as core
-import landmanager.components.base as base
 import landmanager.components.management as management
 
 
