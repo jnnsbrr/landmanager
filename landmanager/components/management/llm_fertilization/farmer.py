@@ -8,14 +8,10 @@
 # URL: <http://www.pik-potsdam.de/copan/software>
 # Contact: core@pik-potsdam.de
 # License: BSD 2-clause license
-import numpy as np
 import time
 import ast
-import pandas as pd
 import xarray as xr
 
-import pycopancore.model_components.base as core
-import landmanager.components.base as base
 import landmanager.components.management as management
 
 
@@ -81,61 +77,42 @@ class Farmer(management.Farmer):
         return response.choices[0].message.content
 
     def decide_fertilizer(self):
-        question_prompt = f"""
-        You are a representative farmer for the 0.5°x0.5° simulation cell
-        centered at {self.position}.
+        question_prompt = f"""You are a crop farmer for the 0.5°x0.5°
+        simulation cell centered at {self.position}.
+        You manage the following crop types on your land (with land
+        fractions): {self.crops}.
+        Your aim is to increase your overall harvest as much as
+        possible.
+        However, all you are able to adjust is the amount of nitrogen
+        fertilizer that you apply to your different crops.
+        Use your general knowlegde about the location and the crops
+        you are growing.
+        Moreover you know the amount of fertilizer you applied in the
+        past {self.mem_fert} as well as the corresponding crop yields
+        (in gC/m²/year) {self.mem_yield}.
+        Please note that some crops (e.g. rainfed pulses and rainfed
+        soybeans) naturally fix nitrogen and generally require less
+        or no external nitrogen.
+        State the reasoning for your decision explicitly for
+        rainfed rice, reinfed maize, and rainfed tropical cereals for
+        every year.
 
-        You manage the following crop types on your land (with land fractions):
-        {self.crops}
-
-        Your goal: **maximize crop yield** by adjusting nitrogen (N) fertilizer
-        application per crop (in gN/m²/year).
-
-        Consider the following historical data as your memory (last 9 years):
-        - Fertilizer application: {self.mem_fert}
-        - Crop yields (in gC/m²/year): {self.mem_yield}
-
-        Apply the following rules:
-        1. Any crop currently fertilized with **less than 5 gN/m²/year** is
-        likely underfertilized. **Increase to crop-specific levels seen in
-        intensive agriculture (~20–30 gN/m²/year)**
-        2. You have been responsible for fertilizer decisions over the last
-        10 years. Your memory covers the past 9 years of data. This year
-        completes the full 10-year span. All rules defined here apply along
-        this period.
-        3. Yield responses are often underlay interferences due to fluctuations
-        of other factors like weather. **Maintain or steadily increase**
-        fertilizer for at least 2–3 years to observe the effects.
-        4. If yields have not clearly saturated (based on memory), continue
-        **increasing fertilizer by 3–5 gN/m²/year** until saturation (more
-        fertilizer do not lead to higher yields). Then keep fertilizer
-        constant.
-        5. **Do not increase fertilization for nitrogen-fixing crops**
-        (e.g., pulses, soybean). Excess fertilizer may lead to negative yield
-        responses.
-        6. Only **reduce fertilizer** if there is a clear and consistent
-        **negative yield trend over the past 3-5 years**. This is mostly only
-        relevant for nitrogen-fixing crops.
-
-        Your task:
-        Estimate the fertilizer amount (gN/m²/year) for each crop for the
-        coming year, following all rules equally.
-
-        ### Format your response exactly like this:
+        Format your response exactly like this:
         Reasoning: [Max 200 characters]
         Response: [['crop1','crop2'], [amount1, amount2]]
 
         Example:
-        Reasoning: Increased temperate cereal N due to low yield response,
-        kept others constant.
+        Reasoning: Increased temperate cereal N due to low yield
+        response, kept others constant.
         Response:
-        [['rainfed temperate cereals','irrigated biomass tree'], [5, 8]]
+        [['rainfed temperate cereals', 'irrigated biomass tree'],
+        [5, 8]]
 
         Technical Note:
         - Use **only** the format above.
-        - Ensure that crop names and amounts match and that both lists are the
-        same length.
-        - Do **not** use semicolons ";" in your response.
+        - Ensure that crop names and amounts match and that both
+        lists are the same length.
+        - Do **not** use semicolons ';' in your response.
         """
 
         messages = [{"role": "system", "content": question_prompt}]

@@ -9,7 +9,10 @@ output:
         - "sdate"
         - "hdate"
         - "hreason"
+        - "hrule"
         - "crop_phu"
+        - "temp"
+        - "prec"
 
 # Define how copan_core_data table file should be written
 output_settings:
