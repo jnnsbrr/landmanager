@@ -781,9 +781,9 @@ class WorldCrop(WorldActivity):
             temp_values
         )
 
-        grow_mask = (
-            (day_values >= sdate) & (day_values < hdate)
-        ).transpose("cell", "day")
+        grow_mask = ((day_values >= sdate) & (day_values < hdate)).transpose(
+            "cell", "day"
+        )  # noqa
 
         if any(self.winter_crop):
             vern_factor = self.calc_vrf(sdate, hdate, monthly_climate)
@@ -796,9 +796,6 @@ class WorldCrop(WorldActivity):
 
         # Compute total PHU requirement efficiently
         husum.values = np.sum(teff, axis=1).astype(int)
-
-        # if self.name == "maize" and self.world.model.lpjml.sim_year in [2025, 2090]:
-        #     breakpoint()
 
         husum = husum.where(self.winter_crop == 0, -husum)
 
@@ -854,19 +851,19 @@ class WorldCrop(WorldActivity):
         # --- Vernalization Effectiveness ---
         veff = np.select(
             [
-                (self.vern_temp_min <= daily_temp) &
-                (daily_temp < self.vern_temp_opt_min),
-                (self.vern_temp_opt_min <= daily_temp) &
-                (daily_temp <= self.vern_temp_opt_max),
-                (self.vern_temp_opt_max < daily_temp) &
-                (daily_temp < self.vern_temp_max),
+                (self.vern_temp_min <= daily_temp)
+                & (daily_temp < self.vern_temp_opt_min),  # noqa
+                (self.vern_temp_opt_min <= daily_temp)
+                & (daily_temp <= self.vern_temp_opt_max),
+                (self.vern_temp_opt_max < daily_temp)
+                & (daily_temp < self.vern_temp_max),  # noqa
             ],
             [
-                (daily_temp - self.vern_temp_min) /
-                (self.vern_temp_opt_min - self.vern_temp_min),
+                (daily_temp - self.vern_temp_min)
+                / (self.vern_temp_opt_min - self.vern_temp_min),
                 1.0,
-                (self.vern_temp_max - daily_temp) /
-                (self.vern_temp_max - self.vern_temp_opt_max),
+                (self.vern_temp_max - daily_temp)
+                / (self.vern_temp_max - self.vern_temp_opt_max),
             ],
             default=0.0,
         )
@@ -875,14 +872,10 @@ class WorldCrop(WorldActivity):
 
         # --- Calculate vd ---
         monthly_temp = monthly_climate["temp"]  # (cell, 12)
-        coldest_months_idx = np.argsort(monthly_temp, axis=1)[
-            :, :max_vern_months
-        ]
+        coldest_months_idx = np.argsort(monthly_temp, axis=1)[:, :max_vern_months]  # noqa
         max_days_per_month = self.max_vern_days / max_vern_months
 
-        month_temp = monthly_temp.values[
-            np.arange(ncell)[:, None], coldest_months_idx
-        ]
+        month_temp = monthly_temp.values[np.arange(ncell)[:, None], coldest_months_idx]  # noqa
         temp_min = self.vern_temp_opt_min.values[:, np.newaxis]
         temp_max = self.vern_temp_opt_max.values[:, np.newaxis]
 
@@ -910,8 +903,12 @@ class WorldCrop(WorldActivity):
                 continue
 
             vdsum = 0.0
-            k = sdate.values[i]-1
-            hd = hdate.values[i]-1 if sdate.values[i] < hdate.values[i] else hdate.values[i] + 365  # noqa
+            k = sdate.values[i] - 1
+            hd = (
+                hdate.values[i] - 1
+                if sdate.values[i] < hdate.values[i]
+                else hdate.values[i] + 365
+            )  # noqa
 
             while vdsum < vd[i] and k < hd:
                 vdsum += veff_full[i, k]
@@ -927,8 +924,12 @@ class WorldCrop(WorldActivity):
                 vrf[i, :] = 1.0
                 continue
 
-            k = sdate.values[i]-1
-            hd = hdate.values[i]-1 if sdate.values[i] < hdate.values[i] else hdate.values[i] + 365  # noqa
+            k = sdate.values[i] - 1
+            hd = (
+                hdate.values[i] - 1
+                if sdate.values[i] < hdate.values[i]
+                else hdate.values[i] + 365
+            )  # noqa
             stop = int(min(endday_vern[i], hd))
 
             for day in range(k, stop):
@@ -951,9 +952,7 @@ class WorldCrop(WorldActivity):
 
 class WorldCropSet(WorldActivity):
 
-    def __init__(
-        self, crop_param_file="crop_calendar/crop_parameters.csv", **kwargs
-    ):
+    def __init__(self, crop_param_file="crop_calendar/crop_parameters.csv", **kwargs):  # noqa
         super().__init__(**kwargs)
 
         # Initiate attributes
@@ -1160,8 +1159,12 @@ class WorldCropSet(WorldActivity):
                 crop_harvest_rule_name  # noqa
             )
 
-            self.world.calendar.temp[:]= self.world.output.temp.isel(time=-1).mean(dim="band")  # noqa
-            self.world.calendar.prec[:]= self.world.output.prec.isel(time=-1).sum(dim="band")  # noqa
+            self.world.calendar.temp[:] = self.world.output.temp.isel(time=-1).mean(  # noqa
+                dim="band"
+            )  # noqa
+            self.world.calendar.prec[:] = self.world.output.prec.isel(time=-1).sum(  # noqa
+                dim="band"
+            )  # noqa
 
             crop_phu_rf = self[crop].calc_phu(
                 monthly_climate=monthly_climate,
@@ -1190,8 +1193,12 @@ class WorldCropSet(WorldActivity):
                 "hreason": xr.full_like(self.world.input.sdate, "", dtype="<U20"),  # noqa
                 "hrule": xr.full_like(self.world.input.sdate, -9999, dtype="<U20"),  # noqa
                 "crop_phu": self.world.input.crop_phu.copy(),
-                "temp": self.world.input.crop_phu.isel(band=0).drop_vars("band").copy(),
-                "prec": self.world.input.crop_phu.isel(band=0).drop_vars("band").copy()
+                "temp": self.world.input.crop_phu.isel(band=0)
+                .drop_vars("band")
+                .copy(),  # noqa
+                "prec": self.world.input.crop_phu.isel(band=0)
+                .drop_vars("band")
+                .copy(),  # noqa
             },
             coords={
                 "cell": self.world.input.cell,
